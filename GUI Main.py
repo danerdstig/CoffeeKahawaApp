@@ -1,44 +1,57 @@
 import tkinter as tk
 from tkinter import ttk
 
+
 class MainMenu:
     def __init__(self, parent):
         self.parent = parent
+        parent.rowconfigure(0, minsize=110, weight=1)
+        parent.rowconfigure(1, minsize=110, weight=1)
+        parent.rowconfigure(2, minsize=110, weight=1)
+        parent.rowconfigure(3, minsize=110, weight=1)
+        parent.rowconfigure(4, minsize=110, weight=1)
+        parent.grid_columnconfigure(0, weight=1)
+        parent.columnconfigure(0, minsize=60, weight=1)
+        parent.columnconfigure(1, minsize=350, weight=1)
+        parent.columnconfigure(2, minsize=125, weight=1)
+        parent.columnconfigure(3, minsize=350, weight=1)
+        parent.columnconfigure(4, minsize=60, weight=1)
 
-        # Create and grid the main frame
-        self.frame = tk.Frame(parent)
-        self.frame.grid(row=0, column=0, sticky="NSEW")
+        welcome_label = tk.Label(parent, text="Kahawa Coffee", font="Arial, 40", bg="white")
+        welcome_label.grid(row=2, column=1, columnspan=3, sticky="N")
+        start_order = tk.Button(text="Start Order",font="Arial, 20", command=self.ordering_root_creation)
+        start_order.grid(row=3, column=3, sticky="WN", pady=10)
+        view_order = tk.Button(text="View Orders",font="Arial, 20", command=self.view_order_root_creation)
+        view_order.grid(row=3, column=1, stick="EN", pady=10)
+#        back_button = tk.Button(parent, text="←", font="80", width=7, height=3)
+#        back_button.grid(row=0, column=0, sticky="SW")
+#        next_button = tk.Button(parent, text="→", font="80", width=7, height=3, command=self.switch_to_ordering_gui)
+#        next_button.grid(row=0, column=4, sticky="SW")
 
-        # Configure grid layout for the frame
-        self.frame.grid_rowconfigure(1, weight=1)  # Updated row index to 1
-        self.frame.grid_columnconfigure(0, weight=1)
-        self.frame.grid_columnconfigure(1, weight=1)
-        self.frame.grid_columnconfigure(2, weight=1)
-        self.frame.grid_columnconfigure(3, weight=1)
-        self.frame.grid_columnconfigure(4, weight=1)
-
-        self.setup_main_menu()
-
-    def setup_main_menu(self):
-        # Define widgets and place them inside self.frame
-        back_button = tk.Button(self.frame, text="←", font="80", width=7, height=3)
-        back_button.grid(row=1, column=0, sticky="SW")
-
-        next_button = tk.Button(self.frame, text="→", font="80", width=7, height=3, command=self.switch_to_ordering_gui)
-        next_button.grid(row=1, column=4, sticky="SW")
-
-        # Store the image to prevent garbage collection
 #        self.photo_welcome_image = tk.PhotoImage(file="Kahawa Coffee tiny.png")
-#        self.photo_welcome = tk.Label(self.frame, image=self.photo_welcome_image, bd=0)
-#        self.photo_welcome.grid(row=1, column=2, sticky="S")
+#        self.photo_welcome = tk.Label(parent, image=self.photo_welcome_image, bd=0)
+#        self.photo_welcome.grid(row=0, column=2, sticky="S")
 
-        banner = tk.Label(self.frame, bg="black", width=200, height=4)
-        banner.grid(row=1, column=0, columnspan=5, sticky="SWE")
+        banner = tk.Label(parent, bg="black", width=200, height=4)
+        banner.grid(row=4, column=0, columnspan=5, sticky="SWE")
         banner.lower()
 
-    def switch_to_ordering_gui(self):
-        self.frame.destroy()
-        OrderingGUI(self.parent)
+    def ordering_root_creation(self):
+        self.parent.destroy()
+        ordering_gui_root = tk.Tk()
+        ordering_gui_root.geometry("950x660")
+        ordering_gui_root.configure(bg="white")
+        ordering_gui_root.resizable(False, False)
+        OrderingGUI(ordering_gui_root)
+        ordering_gui_root.mainloop()
+
+
+    def view_order_root_creation(self):
+        self.parent.destroy()
+        view_order_gui_root = tk.Tk()
+        view_order_gui_root.mainloop()
+        print("worked")
+#        ViewOrdersGUI(self.parent)
 
 class OrderingGUI:
     def __init__(self, parent):
@@ -61,6 +74,7 @@ class OrderingGUI:
         self.notebook.add(frame2, text="Bean Ordering")
         self.notebook.add(frame3, text="Shopping Cart")
 
+
 class ContentFrames:
     def __init__(self, notebook):
         self.notebook = notebook
@@ -80,7 +94,7 @@ class ContentFrames:
                           text="THIS IS A TEST", font=("Times", 24, "bold"))
         label1.grid(row=0, column=0, sticky="NSEW", rowspan=5)
 
-        back_button = tk.Button(frame, text="←", font="80", width=7, height=3)
+        back_button = tk.Button(frame, text="⌂", font="80", width=7, height=3)
         back_button.grid(row=3, column=0, sticky="SW")
         next_button = tk.Button(frame, text="→", font="80", width=7, height=3, command=lambda: self.notebook.select(1))
         next_button.grid(row=3, column=4, sticky="SW")
@@ -150,6 +164,6 @@ if __name__ == "__main__":
     root.geometry("950x660")
     root.configure(bg="white")
     root.resizable(False, False)
-    app = OrderingGUI(root)
+    app = MainMenu(root)
     root.title("Kahawa Coffee")
     root.mainloop()
