@@ -19,9 +19,9 @@ class MainMenu:
 
         welcome_label = tk.Label(parent, text="Kahawa Coffee", font="Arial, 40", bg="white")
         welcome_label.grid(row=2, column=1, columnspan=3, sticky="N")
-        start_order = tk.Button(text="Start Order",font="Arial, 20", command=self.ordering_root_creation)
+        start_order = tk.Button(text="Start Order", font="Arial, 20", command=self.ordering_root_creation)
         start_order.grid(row=3, column=3, sticky="WN", pady=10)
-        view_order = tk.Button(text="View Orders",font="Arial, 20", command=self.view_order_root_creation)
+        view_order = tk.Button(text="View Orders", font="Arial, 20",)
         view_order.grid(row=3, column=1, stick="EN", pady=10)
 #        back_button = tk.Button(parent, text="←", font="80", width=7, height=3)
 #        back_button.grid(row=0, column=0, sticky="SW")
@@ -45,13 +45,16 @@ class MainMenu:
         OrderingGUI(ordering_gui_root)
         ordering_gui_root.mainloop()
 
-
     def view_order_root_creation(self):
         self.parent.destroy()
         view_order_gui_root = tk.Tk()
+        view_order_gui_root.geometry("950x660")
+        view_order_gui_root.configure(bg="white")
+        view_order_gui_root.resizable(False, False)
         view_order_gui_root.mainloop()
         print("worked")
 #        ViewOrdersGUI(self.parent)
+
 
 class OrderingGUI:
     def __init__(self, parent):
@@ -65,7 +68,7 @@ class OrderingGUI:
         style = ttk.Style()
         style.configure("TNotebook.Tab", padding=[20, 10], font=("Arial", 12))
 
-        content_frames = ContentFrames(self.notebook)
+        content_frames = ContentFrames(self.notebook, parent)
         frame1 = content_frames.this_is_a_test()
         frame2 = content_frames.orderingtab_1()
         frame3 = content_frames.orderingtab_2()
@@ -76,8 +79,9 @@ class OrderingGUI:
 
 
 class ContentFrames:
-    def __init__(self, notebook):
+    def __init__(self, notebook, parent):
         self.notebook = notebook
+        self.parent = parent
 
     def this_is_a_test(self):
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
@@ -94,7 +98,7 @@ class ContentFrames:
                           text="THIS IS A TEST", font=("Times", 24, "bold"))
         label1.grid(row=0, column=0, sticky="NSEW", rowspan=5)
 
-        back_button = tk.Button(frame, text="⌂", font="80", width=7, height=3)
+        back_button = tk.Button(frame, text="⌂", font="80", width=7, height=3, command=self.main_menu_root_creation)
         back_button.grid(row=3, column=0, sticky="SW")
         next_button = tk.Button(frame, text="→", font="80", width=7, height=3, command=lambda: self.notebook.select(1))
         next_button.grid(row=3, column=4, sticky="SW")
@@ -158,6 +162,17 @@ class ContentFrames:
         banner.lower()
 
         return frame
+
+    def main_menu_root_creation(self):
+        self.notebook.destroy()
+        self.parent.destory()
+        main_menu_root = tk.Tk()
+        main_menu_root.geometry("950x660")
+        main_menu_root.configure(bg="white")
+        main_menu_root.resizable(False, False)
+        MainMenu(main_menu_root)
+        main_menu_root.mainloop()
+
 
 if __name__ == "__main__":
     root = tk.Tk()
