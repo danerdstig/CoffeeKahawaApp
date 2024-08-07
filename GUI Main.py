@@ -165,7 +165,7 @@ class ContentFrames:
 
     def main_menu_root_creation(self):
         self.notebook.destroy()
-        self.parent.destory()
+        self.parent.destroy()
         main_menu_root = tk.Tk()
         main_menu_root.geometry("950x660")
         main_menu_root.configure(bg="white")
