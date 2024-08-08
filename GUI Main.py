@@ -3,8 +3,9 @@ from tkinter import ttk
 
 
 class MainMenu:
-    def __init__(self, parent):
+    def __init__(self, parent, create_new_roots):
         self.parent = parent
+        self.create_new_roots = create_new_roots
         parent.rowconfigure(0, minsize=110, weight=1)
         parent.rowconfigure(1, minsize=110, weight=1)
         parent.rowconfigure(2, minsize=110, weight=1)
@@ -38,27 +39,22 @@ class MainMenu:
 
     def ordering_root_creation(self):
         self.parent.destroy()
-        ordering_gui_root = tk.Tk()
-        ordering_gui_root.geometry("950x660")
-        ordering_gui_root.configure(bg="white")
-        ordering_gui_root.resizable(False, False)
-        OrderingGUI(ordering_gui_root)
+        ordering_gui_root = self.create_new_roots.create_ordering_root()
+        OrderingGUI(ordering_gui_root, self.create_new_roots)
         ordering_gui_root.mainloop()
 
     def view_order_root_creation(self):
         self.parent.destroy()
-        view_order_gui_root = tk.Tk()
-        view_order_gui_root.geometry("950x660")
-        view_order_gui_root.configure(bg="white")
-        view_order_gui_root.resizable(False, False)
+        view_order_gui_root = self.create_new_roots.create_view_order_root()
         view_order_gui_root.mainloop()
         print("worked")
 #        ViewOrdersGUI(self.parent)
 
 
 class OrderingGUI:
-    def __init__(self, parent):
+    def __init__(self, parent, create_new_roots):
         self.parent = parent
+        self.create_new_roots = create_new_roots
 
         self.notebook = ttk.Notebook(parent)
         self.notebook.grid(row=1, column=0, sticky="NSEW")
@@ -68,21 +64,27 @@ class OrderingGUI:
         style = ttk.Style()
         style.configure("TNotebook.Tab", padding=[20, 10], font=("Arial", 12))
 
-        content_frames = ContentFrames(self.notebook, parent)
+        content_frames = OrderingContentFrames(self.notebook, parent, self.create_new_roots)
         frame1 = content_frames.this_is_a_test()
         frame2 = content_frames.orderingtab_1()
         frame3 = content_frames.orderingtab_2()
 
+        self.notebook.add(command=self.main_menu, text="Main Menu")
         self.notebook.add(frame1, text="Collection Information")
         self.notebook.add(frame2, text="Bean Ordering")
         self.notebook.add(frame3, text="Shopping Cart")
 
+    def main_menu(self):
+        self.parent.destroy()
+        main_menu_root = self.create_new_roots.create_main_menu_root()
+        MainMenu(main_menu_root, self.create_new_roots)
+        main_menu_root.mainloop()
 
-class ContentFrames:
-    def __init__(self, notebook, parent):
+class OrderingContentFrames:
+    def __init__(self, notebook, parent, create_new_roots):
         self.notebook = notebook
         self.parent = parent
-
+        self.create_new_roots = create_new_roots
     def this_is_a_test(self):
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
         frame.grid_rowconfigure(0, weight=1)
@@ -96,7 +98,7 @@ class ContentFrames:
 
         label1 = tk.Label(frame, background="#000000", foreground="#ffffff", padx=30, pady=30,
                           text="THIS IS A TEST", font=("Times", 24, "bold"))
-        label1.grid(row=0, column=0, sticky="NSEW", rowspan=5)
+        label1.grid(row=0, column=0, sticky="NSEW", columnspan=5)
 
         back_button = tk.Button(frame, text="⌂", font="80", width=7, height=3, command=self.main_menu_root_creation)
         back_button.grid(row=3, column=0, sticky="SW")
@@ -163,22 +165,36 @@ class ContentFrames:
 
         return frame
 
-    def main_menu_root_creation(self):
-        self.notebook.destroy()
-        self.parent.destroy()
-        main_menu_root = tk.Tk()
-        main_menu_root.geometry("950x660")
-        main_menu_root.configure(bg="white")
-        main_menu_root.resizable(False, False)
-        MainMenu(main_menu_root)
-        main_menu_root.mainloop()
+
+class CreateNewRoots:
+    def create_ordering_root(self):
+        root = tk.Tk()
+        root.geometry("950x660+10+10")
+        root.configure(bg="white")
+        root.resizable(False, False)
+        return root
+
+    def create_view_order_root(self):
+        root = tk.Tk()
+        root.geometry("950x660+10+10")
+        root.configure(bg="white")
+        root.resizable(False, False)
+        return root
+
+    def create_main_menu_root(self):
+        root = tk.Tk()
+        root.geometry("950x660+10+10")
+        root.configure(bg="white")
+        root.resizable(False, False)
+        return root
 
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.geometry("950x660")
+    root.geometry("950x660+10+10")
     root.configure(bg="white")
     root.resizable(False, False)
-    app = MainMenu(root)
+    create_new_roots = CreateNewRoots()
+    app = MainMenu(root, create_new_roots)
     root.title("Kahawa Coffee")
     root.mainloop()
