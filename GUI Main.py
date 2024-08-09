@@ -11,18 +11,17 @@ class MainMenu:
         parent.rowconfigure(2, minsize=110, weight=1)
         parent.rowconfigure(3, minsize=110, weight=1)
         parent.rowconfigure(4, minsize=110, weight=1)
-        parent.grid_columnconfigure(0, weight=1)
-        parent.columnconfigure(0, minsize=60, weight=1)
-        parent.columnconfigure(1, minsize=350, weight=1)
-        parent.columnconfigure(2, minsize=125, weight=1)
-        parent.columnconfigure(3, minsize=350, weight=1)
-        parent.columnconfigure(4, minsize=60, weight=1)
+        parent.grid_columnconfigure(0, minsize=60, weight=1)
+        parent.grid_columnconfigure(1, minsize=350, weight=1)
+        parent.grid_columnconfigure(2, minsize=125, weight=1)
+        parent.grid_columnconfigure(3, minsize=350, weight=1)
+        parent.grid_columnconfigure(4, minsize=60, weight=1)
 
         welcome_label = tk.Label(parent, text="Kahawa Coffee", font="Arial, 40", bg="white")
         welcome_label.grid(row=2, column=1, columnspan=3, sticky="N")
-        start_order = tk.Button(text="Start Order", font="Arial, 20", command=self.ordering_root_creation)
+        start_order = tk.Button(parent, text="Start Order", font="Arial, 20", command=self.ordering_root_creation)
         start_order.grid(row=3, column=3, sticky="WN", pady=10)
-        view_order = tk.Button(text="View Orders", font="Arial, 20",)
+        view_order = tk.Button(parent, text="View Orders", font="Arial, 20",)
         view_order.grid(row=3, column=1, stick="EN", pady=10)
 #        back_button = tk.Button(parent, text="←", font="80", width=7, height=3)
 #        back_button.grid(row=0, column=0, sticky="SW")
@@ -65,26 +64,37 @@ class OrderingGUI:
         style.configure("TNotebook.Tab", padding=[20, 10], font=("Arial", 12))
 
         content_frames = OrderingContentFrames(self.notebook, parent, self.create_new_roots)
+        frame0 = content_frames.main_menu()
         frame1 = content_frames.this_is_a_test()
         frame2 = content_frames.orderingtab_1()
         frame3 = content_frames.orderingtab_2()
 
-        self.notebook.add(command=self.main_menu, text="Main Menu")
+        self.notebook.add(frame0, text="⌂")
         self.notebook.add(frame1, text="Collection Information")
         self.notebook.add(frame2, text="Bean Ordering")
         self.notebook.add(frame3, text="Shopping Cart")
 
-    def main_menu(self):
-        self.parent.destroy()
-        main_menu_root = self.create_new_roots.create_main_menu_root()
-        MainMenu(main_menu_root, self.create_new_roots)
-        main_menu_root.mainloop()
+        self.notebook.select(1)
+
 
 class OrderingContentFrames:
     def __init__(self, notebook, parent, create_new_roots):
         self.notebook = notebook
         self.parent = parent
         self.create_new_roots = create_new_roots
+
+    def main_menu(self):
+        frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
+        back_button = tk.Button(frame, text="⌂", font="80", width=7, height=3, command=self.create_main_menu_root)
+        back_button.grid(row=3, column=0, sticky="SW")
+        return frame
+
+    def create_main_menu_root(self):
+        self.parent.destroy()
+        main_menu_root = self.create_new_roots.create_main_menu_root()
+        MainMenu(main_menu_root, self.create_new_roots)
+        main_menu_root.mainloop()
+
     def this_is_a_test(self):
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
         frame.grid_rowconfigure(0, weight=1)
@@ -100,7 +110,7 @@ class OrderingContentFrames:
                           text="THIS IS A TEST", font=("Times", 24, "bold"))
         label1.grid(row=0, column=0, sticky="NSEW", columnspan=5)
 
-        back_button = tk.Button(frame, text="⌂", font="80", width=7, height=3, command=self.main_menu_root_creation)
+        back_button = tk.Button(frame, text="⌂", font="80", width=7, height=3, command=self.create_main_menu_root)
         back_button.grid(row=3, column=0, sticky="SW")
         next_button = tk.Button(frame, text="→", font="80", width=7, height=3, command=lambda: self.notebook.select(1))
         next_button.grid(row=3, column=4, sticky="SW")
