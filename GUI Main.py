@@ -75,6 +75,18 @@ class OrderingGUI:
         self.notebook.add(frame3, text="Shopping Cart")
 
         self.notebook.select(1)
+        self.notebook.bind("<<NotebookTabChanged>>", self.main_menu_click)
+
+    def main_menu_click(self, event):
+        selected_tab = self.notebook.index(self.notebook.select())
+        if selected_tab == 0:
+            self.create_main_menu_root()
+
+    def create_main_menu_root(self):
+        self.parent.destroy()
+        main_menu_root = self.create_new_roots.create_main_menu_root()
+        MainMenu(main_menu_root, self.create_new_roots)
+        main_menu_root.mainloop()
 
 
 class OrderingContentFrames:
@@ -85,8 +97,6 @@ class OrderingContentFrames:
 
     def main_menu(self):
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
-        back_button = tk.Button(frame, text="⌂", font="80", width=7, height=3, command=self.create_main_menu_root)
-        back_button.grid(row=3, column=0, sticky="SW")
         return frame
 
     def create_main_menu_root(self):
