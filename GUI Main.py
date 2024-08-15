@@ -22,7 +22,9 @@ class MainMenu:
         start_order = tk.Button(parent, text="Start Order", font="Arial, 20", command=self.ordering_root_creation)
         start_order.grid(row=3, column=3, sticky="WN", pady=10)
         view_order = tk.Button(parent, text="View Orders", font="Arial, 20",)
-        view_order.grid(row=3, column=1, stick="EN", pady=10)
+        view_order.grid(row=3, column=1, sticky="EN", pady=10)
+        exit_program = tk.Button(parent, text="Exit", font="Arial, 20", height=1, command=self.kill_program)
+        exit_program.grid(row=4, column=2, sticky="SWEN")
 #        back_button = tk.Button(parent, text="←", font="80", width=7, height=3)
 #        back_button.grid(row=0, column=0, sticky="SW")
 #        next_button = tk.Button(parent, text="→", font="80", width=7, height=3, command=self.switch_to_ordering_gui)
@@ -33,8 +35,11 @@ class MainMenu:
 #        self.photo_welcome.grid(row=0, column=2, sticky="S")
 
         banner = tk.Label(parent, bg="black", width=200, height=4)
-        banner.grid(row=4, column=0, columnspan=5, sticky="SWE")
+        banner.grid(row=5, column=0, columnspan=5, sticky="SWE")
         banner.lower()
+
+    def kill_program(self):
+        self.parent.destroy()
 
     def ordering_root_creation(self):
         self.parent.destroy()
