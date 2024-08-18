@@ -99,7 +99,12 @@ class OrderingContentFrames:
         self.notebook = notebook
         self.parent = parent
         self.create_new_roots = create_new_roots
-
+        self.pickup = tk.StringVar()
+        self.name = tk.StringVar()
+        self.address = tk.StringVar()
+        self.phone_number = tk.StringVar()
+        self.notes = tk.StringVar()
+        self.email = tk.StringVar()
     def main_menu(self):
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
         return frame
@@ -112,7 +117,8 @@ class OrderingContentFrames:
 
     def this_is_a_test(self):
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
-        frame.grid_rowconfigure(0, weight=1)
+
+        frame.grid_rowconfigure(6, weight=1)
         frame.grid_columnconfigure(0, weight=1)
         frame.columnconfigure(0, minsize=70)
         frame.columnconfigure(1, minsize=265)
@@ -121,18 +127,54 @@ class OrderingContentFrames:
         frame.columnconfigure(4, minsize=70)
         frame.grid_propagate(False)
 
-        label1 = tk.Label(frame, background="#000000", foreground="#ffffff", padx=30, pady=30,
-                          text="THIS IS A TEST", font=("Times", 24, "bold"))
-        label1.grid(row=0, column=0, sticky="NSEW", columnspan=5)
+#       Delivery Or pickup
+        pickup_label = tk.Label(frame, text="Pickup or Delivery?:", font=("Arial", 14))
+        pickup_label.grid(row=0, column=0, sticky="NW", columnspan=2, pady=20)
+        pickup_radio = tk.Radiobutton(frame, text="Pickup", variable=self.pickup, value="Pickup", font=("Arial", 14))
+        pickup_radio.grid(row=0, column=1, sticky="NW", columnspan=2, pady=20, padx=(100, 0))
+        delivery_radio = tk.Radiobutton(frame, text="Delivery", variable=self.pickup, value="Delivery", font=("Arial", 14))
+        delivery_radio.grid(row=0, column=1, sticky="NW", pady=20, padx=(200, 0),  columnspan=2)
 
+#       Contact details
+        name_label = tk.Label(frame, text="Name:", font=("Arial", 14))
+        name_label.grid(row=1, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
+        name_combobox = ttk.Combobox(frame, textvariable=self.name, width=30)
+        name_combobox['values'] = ()
+        name_combobox.grid(row=1, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+
+        address_label = tk.Label(frame, text="Delivery Address:", font=("Arial", 14))
+        address_label.grid(row=2, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
+        address_combobox = ttk.Combobox(frame, textvariable=self.address, width=30)
+        address_combobox['values'] = ()
+        address_combobox.grid(row=2, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+
+        phone_number_label = tk.Label(frame, text="Phone Number:", font=("Arial", 14))
+        phone_number_label.grid(row=3, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
+        phone_number_combobox = ttk.Combobox(frame, textvariable=self.phone_number, width=30)
+        phone_number_combobox['values'] = ()
+        phone_number_combobox.grid(row=3, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+
+        email_label = tk.Label(frame, text="Email Address:", font=("Arial", 14))
+        email_label.grid(row=4, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
+        email_combobox = ttk.Combobox(frame, textvariable=self.email, width=30)
+        email_combobox['values'] = ()
+        email_combobox.grid(row=4, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+
+        notes_label = tk.Label(frame, text="Notes:", font=("Arial", 14))
+        notes_label.grid(row=5, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
+        notes_combobox = ttk.Combobox(frame, textvariable=self.notes, width=30)
+        notes_combobox['values'] = ()
+        notes_combobox.grid(row=5, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+
+        #       Banner navigation buttons
         back_button = tk.Button(frame, text="⌂", font="80", width=7, height=3, command=self.create_main_menu_root)
-        back_button.grid(row=3, column=0, sticky="SW")
+        back_button.grid(row=7, column=0, sticky="SW")
         next_button = tk.Button(frame, text="→", font="80", width=7, height=3, command=lambda: self.notebook.select(1))
-        next_button.grid(row=3, column=4, sticky="SW")
+        next_button.grid(row=7, column=4, sticky="SW")
         current_tab = tk.Label(frame, text="Kahawa Coffee™ - Ordering Tab 1", font="3000", bg="black")
-        current_tab.grid(row=3, column=2, sticky="SNEW", pady=10)
+        current_tab.grid(row=7, column=2, sticky="SNEW", pady=10)
         banner = tk.Label(frame, bg="black", width=200, height=4)
-        banner.grid(row=3, column=0, columnspan=5, sticky="SWEN")
+        banner.grid(row=7, column=0, columnspan=5, sticky="SWEN")
         banner.lower()
 
         return frame
