@@ -17,14 +17,45 @@ class MainMenu:
         parent.grid_columnconfigure(3, minsize=350, weight=1)
         parent.grid_columnconfigure(4, minsize=60, weight=1)
 
-        welcome_label = tk.Label(parent, text="Kahawa Coffee", font="Arial, 40", bg="white")
-        welcome_label.grid(row=2, column=1, columnspan=3, sticky="N")
+        self.ascii_art = """
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⠤⠴⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣧⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⣄⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠒⠶⠤⡀⠀⠀⠀⠀⠀⠀⠀⣸⡆⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⡤⠴⠿⠂⠀⠀⠀⠀⠀⣠⠿⠁⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⡤⠤⠖⠛⠋⠉⠀⠀⠀⠀⠀⢀⣀⣠⠤⠔⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⠀⢀⡤⠶⠚⠉⠁⠀⠀⠀⢀⣀⣠⠤⠤⠒⠒⠊⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⢠⡞⠉⠀⠀⠀⠀⢀⣤⠖⠚⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠸⣷⠇⠀⠀⠀⠀⢯⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⠈⠉⠛⠛⠛⠛⠓⠒⠿⠿⣟⡛⠓⠒⠒⠛⢒⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⠀⠀⠀⣀⣀⣤⣤⡤⠦⠴⠾⡿⠒⠛⠛⠛⣳⠿⠷⢤⣤⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⢀⣤⣶⠟⠛⠉⠉⠁⠀⢀⣠⠞⠁⠀⣠⡤⠚⠁⠀⠀⠀⠈⠉⠙⠻⢷⣶⣄⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⣰⣿⣏⠀⠀⠀⠀⠀⣀⣤⣯⣤⣤⣴⣿⣿⣶⣦⣤⣤⣤⣀⠀⠀⠀⠀⠀⠉⢻⣧⠀⠀⠀⠀⠀⠀
+        ⠀⢰⣿⣿⣿⣄⣤⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⣿⣿⣶⣤⡀⠀⢰⣿⡇⣀⣀⡀⠀⠀
+        ⠀⠸⣿⣿⣿⣿⣟⣯⡿⣿⡛⢛⣭⣿⣿⣻⣿⣿⣿⣿⣿⣿⣿⣟⣦⣼⣿⣿⣿⣷⣿⣿⡟⣉⡉⠙⣧⠀
+        ⠀⠀⢹⣿⣿⣿⡿⢿⡿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠛⠛⠛⠉⠁⣼⡿⠋⠉⠹⡆⢸⡆
+        ⠀⠀⠀⣿⣿⣿⣿⣤⡄⠀⠀⠉⠉⠉⠉⠙⠋⠉⠉⠉⠉⠉⠉⠁⠀⠀⠀⠀⠀⢐⡿⠁⠀⠀⢰⡇⣸⠃
+        ⠀⠀⠀⠘⣿⣼⣿⣿⣶⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡿⠁⠀⣀⡴⠟⣸⠟⠀
+        ⠀⠀⠀⠀⠘⣿⣿⣿⣿⣾⣤⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡿⣶⣖⣊⣭⠴⠋⠁⠀⠀
+        ⠀⠀⠀⠀⣀⣨⣿⣿⣿⣿⣿⣶⡔⣡⡀⣀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣾⣏⡉⠉⠉⠁⠀⠀⠀⠀⠀⠀
+        ⠀⣀⣴⠾⠛⠛⠉⣩⣿⣿⣿⢿⣿⣿⣿⣿⣠⣦⣤⣆⣀⣤⣠⣴⣿⣭⡉⠙⠛⢷⣦⠀⠀⠀⠀⠀⠀⠀
+        ⢰⡿⠃⠀⠀⠀⣼⣿⢿⣿⣿⣿⣿⣿⡿⠿⠿⠿⠛⠛⠛⢋⣻⠀⠈⠙⣿⠄⠀⠀⣿⣷⡄⠀⠀⠀⠀⠀
+        ⣿⣧⠲⡀⠀⠀⢿⣿⣏⡉⠉⠉⠉⠙⠛⠒⠺⠖⠒⠛⠋⠉⠉⠀⠀⣰⠟⠀⠀⠀⡎⣻⡇⠀⠀⠀⠀⠀
+        ⠙⠿⣷⣬⣷⢤⣈⡉⠲⠉⣇⠒⠒⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⠋⠁⠀⠀⢀⢀⣴⡿⠁⠀⠀⠀⠀⠀
+        ⠀⠀⠈⠛⠻⢿⣶⣭⣿⣶⣤⣤⣤⣀⣀⣀⣀⣀⡀⠀⠀⠀⠀⣀⣀⣤⣴⡷⠿⠛⠁⠀⠀⠀⠀⠀⠀⠀
+        ⠀⠀⠀⠀⠀⠀⠈⠉⠙⠛⠛⠛⠛⠛⠿⠿⠛⠿⠟⠛⠛⠋⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀
+        """
+
+        welcome_label2 = tk.Label(parent, text="Kahawa Coffee", font=("Arial", 40), bg="white", justify="left")
+        welcome_label2.grid(row=0, column=1, columnspan=3, sticky="N", pady=(5, 0))
+        welcome_label = tk.Label(parent, text=self.ascii_art, font=("Arial", 12), bg="white", justify="left")
+
+        welcome_label.grid(row=0, column=1, columnspan=3, rowspan=4, sticky="N", pady=(58, 0))
         start_order = tk.Button(parent, text="Start Order", font="Arial, 20", command=self.ordering_root_creation)
-        start_order.grid(row=3, column=3, sticky="WN", pady=10)
+        start_order.grid(row=3, column=2, sticky="SWE")
         view_order = tk.Button(parent, text="View Orders", font="Arial, 20", command=self.view_order_root_creation)
-        view_order.grid(row=3, column=1, sticky="EN", pady=10)
-        exit_program = tk.Button(parent, text="Exit", font="Arial, 20", height=1, command=self.kill_program)
-        exit_program.grid(row=4, column=2, sticky="SWEN")
+        view_order.grid(row=4, column=2, sticky="SWE")
+        exit_program = tk.Button(parent, text="Exit", font="Arial, 20", command=self.kill_program)
+        exit_program.grid(row=5, column=2, sticky="SWE")
 #        back_button = tk.Button(parent, text="←", font="80", width=7, height=3)
 #        back_button.grid(row=0, column=0, sticky="SW")
 #        next_button = tk.Button(parent, text="→", font="80", width=7, height=3, command=self.switch_to_ordering_gui)
@@ -33,10 +64,6 @@ class MainMenu:
 #        self.photo_welcome_image = tk.PhotoImage(file="Kahawa Coffee tiny.png")
 #        self.photo_welcome = tk.Label(parent, image=self.photo_welcome_image, bd=0)
 #        self.photo_welcome.grid(row=0, column=2, sticky="S")
-
-        banner = tk.Label(parent, bg="black", width=200, height=4)
-        banner.grid(row=5, column=0, columnspan=5, sticky="SWE")
-        banner.lower()
 
     def kill_program(self):
         self.parent.destroy()
@@ -99,13 +126,16 @@ class OrderingContentFrames:
         self.notebook = notebook
         self.parent = parent
         self.create_new_roots = create_new_roots
-        self.pickup = tk.StringVar(value="")
+        self.pickup_or_delivery = tk.StringVar(value="")
         self.name = tk.StringVar(value="")
         self.address = tk.StringVar(value="")
         self.phone_number = tk.StringVar(value="")
         self.notes = tk.StringVar(value="")
         self.email = tk.StringVar(value="")
         self.bean = tk.StringVar(value="")
+        self.whole_or_ground = tk.StringVar(value="")
+        self.bean_colour = tk.StringVar(value="")
+        self.bean_amount = tk.IntVar()
     def main_menu(self):
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
         return frame
@@ -131,12 +161,12 @@ class OrderingContentFrames:
         frame.grid_propagate(False)
 
 #       Delivery Or pickup - this will be a logic gate once I create the database
-        pickup_label = tk.Label(frame, text="Pickup or Delivery?:", font=("Arial", 14))
-        pickup_label.grid(row=0, column=0, sticky="NW", columnspan=2, pady=20)
-        pickup_radio = tk.Radiobutton(frame, text="Pickup", variable=self.pickup, value="Pickup", font=("Arial", 14))
-        pickup_radio.grid(row=0, column=1, sticky="NW", columnspan=2, pady=20, padx=(100, 0))
-        delivery_radio = tk.Radiobutton(frame, text="Delivery", variable=self.pickup, value="Delivery", font=("Arial", 14))
-        delivery_radio.grid(row=0, column=1, sticky="NW", pady=20, padx=(200, 0),  columnspan=2)
+        pickup_or_delivery_label = tk.Label(frame, text="Pickup or Delivery?:", font=("Arial", 14))
+        pickup_or_delivery_label.grid(row=0, column=0, sticky="NW", columnspan=2, pady=(20, 0))
+        pickup_radio = tk.Radiobutton(frame, text="Pickup", variable=self.pickup_or_delivery, value="Pickup", font=("Arial", 14))
+        pickup_radio.grid(row=0, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(100, 0))
+        delivery_radio = tk.Radiobutton(frame, text="Delivery", variable=self.pickup_or_delivery, value="Delivery", font=("Arial", 14))
+        delivery_radio.grid(row=0, column=1, sticky="NW", pady=(20, 0), padx=(200, 0),  columnspan=2)
 
 #       Contact details
         name_label = tk.Label(frame, text="Name:", font=("Arial", 14))
@@ -197,15 +227,40 @@ class OrderingContentFrames:
 
 #       logic gate for which bean is to be ordered
         bean_label = tk.Label(frame, text="Bean type:", font=("Arial", 14))
-        bean_label.grid(row=0, column=0, sticky="NW", columnspan=2, pady=20)
+        bean_label.grid(row=0, column=0, sticky="NW", columnspan=2, pady=(20, 0))
         arabica_radio = tk.Radiobutton(frame, text="Arabica", variable=self.bean, value="Arabica", font=("Arial", 14))
-        arabica_radio.grid(row=0, column=1, sticky="NW", columnspan=2, pady=20, padx=(25, 0))
+        arabica_radio.grid(row=0, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(50, 0))
         robusta_radio = tk.Radiobutton(frame, text="Robusta", variable=self.bean, value="Robusta", font=("Arial", 14))
-        robusta_radio.grid(row=0, column=1, sticky="NW", pady=20, padx=(125, 0),  columnspan=2)
+        robusta_radio.grid(row=0, column=1, sticky="NW", pady=(20, 0), padx=(150, 0),  columnspan=2)
         liberica_radio = tk.Radiobutton(frame, text="Liberica", variable=self.bean, value="Liberica", font=("Arial", 14))
-        liberica_radio.grid(row=0, column=1, sticky="NW", columnspan=2, pady=20, padx=(225, 0))
+        liberica_radio.grid(row=0, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(250, 0))
         exclesa_radio = tk.Radiobutton(frame, text="Excelsa", variable=self.bean, value="Excelsa", font=("Arial", 14))
-        exclesa_radio.grid(row=0, column=1, sticky="NW", columnspan=2, pady=20, padx=(325, 0))
+        exclesa_radio.grid(row=0, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(350, 0))
+
+        # Bean colour section
+        bean_colour_label = tk.Label(frame, text="Bean colour:", font=("Arial", 14))
+        bean_colour_label.grid(row=1, column=0, sticky="NW", columnspan=2, pady=(20, 0))
+        light_radio = tk.Radiobutton(frame, text="Light", variable=self.bean_colour, value="Light", font=("Arial", 14))
+        light_radio.grid(row=1, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(50, 0))
+        medium_radio = tk.Radiobutton(frame, text="Medium", variable=self.bean_colour, value="Medium", font=("Arial", 14))
+        medium_radio.grid(row=1, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(150, 0))
+        dark_radio = tk.Radiobutton(frame, text="Dark", variable=self.bean_colour, value="Dark", font=("Arial", 14))
+        dark_radio.grid(row=1, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(250, 0))
+        extra_dark_radio = tk.Radiobutton(frame, text="Extra Dark", variable=self.bean_colour, value="Extra Dark", font=("Arial", 14))
+        extra_dark_radio.grid(row=1, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(350, 0))
+
+        # Whole or Ground section
+        whole_or_ground_label = tk.Label(frame, text="Whole or Ground?:", font=("Arial", 14))
+        whole_or_ground_label.grid(row=2, column=0, sticky="NW", columnspan=2, pady=(20, 0))
+        whole_radio = tk.Radiobutton(frame, text="Whole", variable=self.whole_or_ground, value="Whole", font=("Arial", 14))
+        whole_radio.grid(row=2, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(150, 0))
+        ground_radio = tk.Radiobutton(frame, text="Ground", variable=self.whole_or_ground, value="Ground", font=("Arial", 14))
+        ground_radio.grid(row=2, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(250, 0))
+
+        amount_label = tk.Label(frame, text="Amount:", font=("Arial", 14))
+        amount_label.grid(row=3, column=0, sticky="NW")
+        amount_spinbox = ttk.Spinbox(frame, from_=0, to=5, textvariable=self.bean_amount, width=30)
+        amount_spinbox.grid(row=3, column=1, sticky="NW", pady=5,  padx=(20, 0))
 
 #       Banner navigation buttons
         back_button = tk.Button(frame, text="←", font="80", width=7, height=3, command=lambda: self.notebook.select(1))
@@ -249,6 +304,7 @@ class CreateNewRoots:
         root = tk.Tk()
         root.geometry("950x660+10+10")
         root.configure(bg="white")
+        root.title("Kahawa Coffee")
         root.resizable(False, False)
         return root
 
@@ -256,6 +312,7 @@ class CreateNewRoots:
         root = tk.Tk()
         root.geometry("950x660+10+10")
         root.configure(bg="white")
+        root.title("Kahawa Coffee")
         root.resizable(False, False)
         return root
 
@@ -263,6 +320,7 @@ class CreateNewRoots:
         root = tk.Tk()
         root.geometry("950x660+10+10")
         root.configure(bg="white")
+        root.title("Kahawa Coffee")
         root.resizable(False, False)
         return root
 
@@ -271,8 +329,8 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.geometry("950x660+10+10")
     root.configure(bg="white")
+    root.title("Kahawa Coffee")
     root.resizable(False, False)
     create_new_roots = CreateNewRoots()
     app = MainMenu(root, create_new_roots)
-    root.title("Kahawa Coffee")
     root.mainloop()
