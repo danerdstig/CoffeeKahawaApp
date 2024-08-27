@@ -274,6 +274,31 @@ class OrderingContentFrames:
         frame.columnconfigure(4, minsize=70)
         frame.grid_propagate(False)
 
+        style = ttk.Style()
+        style.configure("Treeview.Heading", background="#f0f0f0", foreground="black")
+
+        order_tree = ttk.Treeview(frame, columns=("Bean", "Type", "Price"), show="headings")
+        order_tree.heading("Bean", text="Bean")
+        order_tree.heading("Type", text="Type")
+        order_tree.heading("Price", text="Price")
+        order_tree.column("Bean", width=100, anchor="center")
+        order_tree.column("Type", width=100, anchor="center")
+        order_tree.column("Price", width=100, anchor="center")
+        data = [
+            ("Arabica", "Whole Bean", "$15.00"),
+            ("Robusta", "Ground", "$12.50"),
+            ("Liberica", "Espresso", "$18.00")
+        ]
+        for index, row in enumerate(data):
+            tag = 'oddrow' if index % 2 == 0 else 'evenrow'
+            order_tree.insert("", "end", values=row, tags=(tag,))
+        
+        order_tree.tag_configure('oddrow', background='#f0f0f0')
+        order_tree.tag_configure('evenrow', background='#e0e0e0')
+            
+        order_tree.grid(row=1, column=1, sticky="NSWE")
+
+
         back_button = tk.Button(frame, text="←", font="80", width=7, height=3, command=lambda: self.notebook.select(2))
         back_button.grid(row=3, column=0, sticky="SW")
         next_button = tk.Button(frame, text="⌂", font="80", width=7, height=3, command=self.create_main_menu_root)
