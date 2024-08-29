@@ -41,11 +41,11 @@ class MainMenu:
         start_order = tk.Button(parent, text="Start Order", font=("Arial", 20), command=self.ordering_root_creation)
         start_order.grid(row=3, column=0, sticky="WEN", padx=(5, 0))
         view_order = tk.Button(parent, text="View Orders", font=("Arial", 20), command=self.view_order_root_creation)
-        view_order.grid(row=3, column=0, sticky="WEN", rowspan=2, pady=(60,0), padx=(5, 0))
+        view_order.grid(row=3, column=0, sticky="WEN", rowspan=2, pady=(60, 0), padx=(5, 0))
         exit_program = tk.Button(parent, text="Exit", font=("Arial", 20), command=self.kill_program)
         exit_program.grid(row=6, column=0, sticky="SWEN", padx=(5, 0), pady=(0, 5))
         welcome_label = tk.Label(parent, text=self.coffee_logo_art, font=("Arial", 12), bg="white", justify="left")
-        welcome_label.grid(row=0, rowspan=4, column=2, pady=(58, 0), padx=(70,0))
+        welcome_label.grid(row=0, rowspan=4, column=2, pady=(58, 0), padx=(70, 0))
 
     def kill_program(self):
         self.parent.destroy()
@@ -61,6 +61,8 @@ class MainMenu:
         view_order_gui_root = self.create_new_roots.create_view_order_root()
         view_order_gui_root.mainloop()
         print("worked")
+
+
 #        ViewOrdersGUI(self.parent)
 
 
@@ -119,9 +121,26 @@ class OrderingContentFrames:
         self.bean_colour = tk.StringVar(value="N/A")
         self.bean_amount = tk.IntVar()
 
-#       setting RadioButton Style
+        #       setting RadioButton Style
         self.style = ttk.Style()
         self.style.configure("Custom.TRadiobutton", font=("Arial", 14))
+
+    def frame_config(self, frame): #This is a funcution that configures how my frames are setup, this is used for raech frame created
+
+        frame.grid_propagate(False)
+        frame.grid_columnconfigure(0, weight=1)
+        frame.columnconfigure(0, minsize=70)
+        frame.columnconfigure(1, minsize=265)
+        frame.columnconfigure(2, minsize=275)
+        frame.columnconfigure(3, minsize=265)
+        frame.columnconfigure(4, minsize=70)
+        total_rows = 7
+        row_to_config = 6
+        for row in range(total_rows):
+            if row == row_to_config:
+                frame.grid_rowconfigure(row, weight=1)
+            else:
+                frame.grid_rowconfigure(row, weight=0)
 
     def main_menu(self):
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
@@ -134,28 +153,21 @@ class OrderingContentFrames:
         main_menu_root.mainloop()
 
     def customer_details(self):
-
-#       Setup the frame for the widgets
+        #       Setup the frame for the widgets
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
+        self.frame_config(frame)
 
-        frame.grid_rowconfigure(6, weight=1)
-        frame.grid_columnconfigure(0, weight=1)
-        frame.columnconfigure(0, minsize=70)
-        frame.columnconfigure(1, minsize=265)
-        frame.columnconfigure(2, minsize=275)
-        frame.columnconfigure(3, minsize=265)
-        frame.columnconfigure(4, minsize=70)
-        frame.grid_propagate(False)
-
-#       Delivery Or pickup - this will be a logic gate once I create the database
+        #       Delivery Or pickup - this will be a logic gate once I create the database
         pickup_or_delivery_label = tk.Label(frame, text="Pickup or Delivery?:", font=("Arial", 14))
         pickup_or_delivery_label.grid(row=0, column=0, sticky="NW", columnspan=2, pady=(20, 0), padx=5)
-        pickup_radio = ttk.Radiobutton(frame, text="Pickup", variable=self.pickup_or_delivery, value="Pickup", style="Custom.TRadiobutton", takefocus=0)
+        pickup_radio = ttk.Radiobutton(frame, text="Pickup", variable=self.pickup_or_delivery, value="Pickup",
+                                       style="Custom.TRadiobutton", takefocus=0)
         pickup_radio.grid(row=0, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(100, 0))
-        delivery_radio = ttk.Radiobutton(frame, text="Delivery", variable=self.pickup_or_delivery, value="Delivery", style="Custom.TRadiobutton", takefocus=0)
-        delivery_radio.grid(row=0, column=1, sticky="NW", pady=(20, 0), padx=(200, 0),  columnspan=2)
+        delivery_radio = ttk.Radiobutton(frame, text="Delivery", variable=self.pickup_or_delivery, value="Delivery",
+                                         style="Custom.TRadiobutton", takefocus=0)
+        delivery_radio.grid(row=0, column=1, sticky="NW", pady=(20, 0), padx=(200, 0), columnspan=2)
 
-#       Contact details
+        #       Contact details
         name_label = tk.Label(frame, text="Name:", font=("Arial", 14))
         name_label.grid(row=1, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
         name_combobox = ttk.Combobox(frame, textvariable=self.name, width=30)
@@ -186,12 +198,13 @@ class OrderingContentFrames:
         notes_combobox['values'] = ()
         notes_combobox.grid(row=5, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
-#       Banner navigation buttons
+        #       Banner navigation buttons
         back_button = tk.Button(frame, text="⌂", font="80", width=7, height=3, command=self.create_main_menu_root)
         back_button.grid(row=7, column=0, sticky="SW")
         next_button = tk.Button(frame, text="→", font="80", width=7, height=3, command=lambda: self.notebook.select(2))
         next_button.grid(row=7, column=4, sticky="SW")
-        current_tab = tk.Label(frame, text="Kahawa Coffee™ - Customers Details", font=("Arial", 14), fg="white", bg="black")
+        current_tab = tk.Label(frame, text="Kahawa Coffee™ - Customers Details", font=("Arial", 14), fg="white",
+                               bg="black")
         current_tab.grid(row=7, column=1, sticky="SNEW", pady=10, columnspan=3)
         banner = tk.Label(frame, bg="black", width=200, height=4)
         banner.grid(row=7, column=0, columnspan=5, sticky="SWEN")
@@ -200,57 +213,59 @@ class OrderingContentFrames:
         return frame
 
     def bean_ordering(self):
-
-#       Setup the frame for the widgets
+        #       Setup the frame for the widgets
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
 
-        frame.grid_rowconfigure(6, weight=1)
-        frame.grid_columnconfigure(0, weight=1)
-        frame.columnconfigure(0, minsize=70)
-        frame.columnconfigure(1, minsize=265)
-        frame.columnconfigure(2, minsize=275)
-        frame.columnconfigure(3, minsize=265)
-        frame.columnconfigure(4, minsize=70)
-        frame.grid_propagate(False)
+        self.frame_config(frame)
 
-#       logic gate for which bean is to be ordered
+        #       logic gate for which bean is to be ordered
         bean_label = tk.Label(frame, text="Bean type:", font=("Arial", 14))
         bean_label.grid(row=0, column=0, sticky="NW", columnspan=2, pady=(20, 0), padx=5)
-        arabica_radio = ttk.Radiobutton(frame, text="Arabica", variable=self.bean, value="Arabica", style="Custom.TRadiobutton", takefocus=0)
+        arabica_radio = ttk.Radiobutton(frame, text="Arabica", variable=self.bean, value="Arabica",
+                                        style="Custom.TRadiobutton", takefocus=0)
         arabica_radio.grid(row=0, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(50, 0))
-        robusta_radio = ttk.Radiobutton(frame, text="Robusta", variable=self.bean, value="Robusta", style="Custom.TRadiobutton", takefocus=0)
-        robusta_radio.grid(row=0, column=1, sticky="NW", pady=(20, 0), padx=(150, 0),  columnspan=2)
-        liberica_radio = ttk.Radiobutton(frame, text="Liberica", variable=self.bean, value="Liberica", style="Custom.TRadiobutton", takefocus=0)
+        robusta_radio = ttk.Radiobutton(frame, text="Robusta", variable=self.bean, value="Robusta",
+                                        style="Custom.TRadiobutton", takefocus=0)
+        robusta_radio.grid(row=0, column=1, sticky="NW", pady=(20, 0), padx=(150, 0), columnspan=2)
+        liberica_radio = ttk.Radiobutton(frame, text="Liberica", variable=self.bean, value="Liberica",
+                                         style="Custom.TRadiobutton", takefocus=0)
         liberica_radio.grid(row=0, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(250, 0))
-        exclesa_radio = ttk.Radiobutton(frame, text="Excelsa", variable=self.bean, value="Excelsa", style="Custom.TRadiobutton", takefocus=0)
+        exclesa_radio = ttk.Radiobutton(frame, text="Excelsa", variable=self.bean, value="Excelsa",
+                                        style="Custom.TRadiobutton", takefocus=0)
         exclesa_radio.grid(row=0, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(350, 0))
 
         # Bean colour section
         bean_colour_label = tk.Label(frame, text="Bean colour:", font=("Arial", 14))
         bean_colour_label.grid(row=1, column=0, sticky="NW", columnspan=2, pady=(20, 0), padx=5)
-        light_radio = ttk.Radiobutton(frame, text="Light", variable=self.bean_colour, value="Light", style="Custom.TRadiobutton", takefocus=0)
+        light_radio = ttk.Radiobutton(frame, text="Light", variable=self.bean_colour, value="Light",
+                                      style="Custom.TRadiobutton", takefocus=0)
         light_radio.grid(row=1, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(50, 0))
-        medium_radio = ttk.Radiobutton(frame, text="Medium", variable=self.bean_colour, value="Medium", style="Custom.TRadiobutton", takefocus=0)
+        medium_radio = ttk.Radiobutton(frame, text="Medium", variable=self.bean_colour, value="Medium",
+                                       style="Custom.TRadiobutton", takefocus=0)
         medium_radio.grid(row=1, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(150, 0))
-        dark_radio = ttk.Radiobutton(frame, text="Dark", variable=self.bean_colour, value="Dark", style="Custom.TRadiobutton", takefocus=0)
+        dark_radio = ttk.Radiobutton(frame, text="Dark", variable=self.bean_colour, value="Dark",
+                                     style="Custom.TRadiobutton", takefocus=0)
         dark_radio.grid(row=1, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(250, 0))
-        extra_dark_radio = ttk.Radiobutton(frame, text="Extra Dark", variable=self.bean_colour, value="Extra Dark", style="Custom.TRadiobutton", takefocus=0)
+        extra_dark_radio = ttk.Radiobutton(frame, text="Extra Dark", variable=self.bean_colour, value="Extra Dark",
+                                           style="Custom.TRadiobutton", takefocus=0)
         extra_dark_radio.grid(row=1, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(350, 0))
 
         # Whole or Ground section
         whole_or_ground_label = tk.Label(frame, text="Whole or Ground?:", font=("Arial", 14))
         whole_or_ground_label.grid(row=2, column=0, sticky="NW", columnspan=2, pady=(20, 0), padx=5)
-        whole_radio = ttk.Radiobutton(frame, text="Whole", variable=self.whole_or_ground, value="Whole", style="Custom.TRadiobutton", takefocus=0)
+        whole_radio = ttk.Radiobutton(frame, text="Whole", variable=self.whole_or_ground, value="Whole",
+                                      style="Custom.TRadiobutton", takefocus=0)
         whole_radio.grid(row=2, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(150, 0))
-        ground_radio = ttk.Radiobutton(frame, text="Ground", variable=self.whole_or_ground, value="Ground", style="Custom.TRadiobutton", takefocus=0)
+        ground_radio = ttk.Radiobutton(frame, text="Ground", variable=self.whole_or_ground, value="Ground",
+                                       style="Custom.TRadiobutton", takefocus=0)
         ground_radio.grid(row=2, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(250, 0))
 
         amount_label = tk.Label(frame, text="Amount:", font=("Arial", 14))
         amount_label.grid(row=3, column=0, sticky="NW", pady=(20, 0), columnspan=2, padx=5)
         amount_spinbox = ttk.Spinbox(frame, from_=0, to=5, textvariable=self.bean_amount, width=30)
-        amount_spinbox.grid(row=3, column=1, sticky="NW", pady=(20, 0),  padx=(25, 0))
+        amount_spinbox.grid(row=3, column=1, sticky="NW", pady=(20, 0), padx=(25, 0))
 
-#       Banner navigation buttons
+        #       Banner navigation buttons
         back_button = tk.Button(frame, text="←", font="80", width=7, height=3, command=lambda: self.notebook.select(1))
         back_button.grid(row=7, column=0, sticky="SW")
         next_button = tk.Button(frame, text="→", font="80", width=7, height=3, command=lambda: self.notebook.select(3))
@@ -265,18 +280,13 @@ class OrderingContentFrames:
 
     def confirm_order(self):
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
-        frame.grid_rowconfigure(0, weight=1)
-        frame.grid_columnconfigure(0, weight=1)
-        frame.columnconfigure(0, minsize=70)
-        frame.columnconfigure(1, minsize=265)
-        frame.columnconfigure(2, minsize=275)
-        frame.columnconfigure(3, minsize=265)
-        frame.columnconfigure(4, minsize=70)
-        frame.grid_propagate(False)
+        self.frame_config(frame)
 
         style = ttk.Style()
         style.configure("Treeview.Heading", background="#f0f0f0", foreground="black")
 
+        order_label = tk.Label(frame, text="Order Summary:", font=("Arial", 14))
+        order_label.grid(row=0, column=0, sticky="NW", columnspan=2, pady=(10, 5))
         order_tree = ttk.Treeview(frame, columns=("Bean", "Type", "Price"), show="headings")
         order_tree.heading("Bean", text="Bean")
         order_tree.heading("Type", text="Type")
@@ -292,21 +302,24 @@ class OrderingContentFrames:
         for index, row in enumerate(data):
             tag = 'oddrow' if index % 2 == 0 else 'evenrow'
             order_tree.insert("", "end", values=row, tags=(tag,))
-        
+
         order_tree.tag_configure('oddrow', background='#f0f0f0')
         order_tree.tag_configure('evenrow', background='#e0e0e0')
-            
-        order_tree.grid(row=1, column=1, sticky="NSWE")
+        order_tree.grid(row=1, column=0, sticky="SWEN", columnspan=5)
 
+        add_to_order_button = tk.Button(frame, text="+", font=("Arial", 14), command=lambda: self.notebook.select(2))
+        add_to_order_button.grid(row=2, column=0, sticky="SWE")
+        add_to_order_label = tk.Label(frame, text="Add to Order", font=("Arial", 14))
+        add_to_order_label.grid(row=2, column=1, sticky="NSW", padx=(5, 0))
 
         back_button = tk.Button(frame, text="←", font="80", width=7, height=3, command=lambda: self.notebook.select(2))
-        back_button.grid(row=3, column=0, sticky="SW")
+        back_button.grid(row=7, column=0, sticky="SW")
         next_button = tk.Button(frame, text="⌂", font="80", width=7, height=3, command=self.create_main_menu_root)
-        next_button.grid(row=3, column=4, sticky="SW")
+        next_button.grid(row=7, column=4, sticky="SW")
         current_tab = tk.Label(frame, text="Kahawa Coffee™ - Confirm Order", font=("Arial", 14), fg="white", bg="black")
-        current_tab.grid(row=7, column=1, sticky="SNEW", pady=10, columnspan=3)
+        current_tab.grid(row=7, column=1, sticky="SWEN", pady=10, columnspan=3)
         banner = tk.Label(frame, bg="black", width=200, height=4)
-        banner.grid(row=3, column=0, columnspan=5, sticky="SWEN")
+        banner.grid(row=7, column=0, columnspan=5, sticky="SWEN")
         banner.lower()
 
         return frame
