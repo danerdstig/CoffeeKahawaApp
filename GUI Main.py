@@ -283,28 +283,36 @@ class OrderingContentFrames:
         self.frame_config(frame)
 
         style = ttk.Style()
-        style.configure("Treeview.Heading", background="#f0f0f0", foreground="black")
+        style.configure("Treeview.Heading", background="#e0e0e0", foreground="black", font=("Arial, 14"))
 
         order_label = tk.Label(frame, text="Order Summary:", font=("Arial", 14))
-        order_label.grid(row=0, column=0, sticky="NW", columnspan=2, pady=(10, 5))
-        order_tree = ttk.Treeview(frame, columns=("Bean", "Type", "Price"), show="headings")
+        order_label.grid(row=0, column=0, sticky="NW", columnspan=2, pady=(125, 5))
+        order_tree = ttk.Treeview(frame, columns=("Bean", "Type", "Amount", "Price", "Total"), show="headings")
         order_tree.heading("Bean", text="Bean")
         order_tree.heading("Type", text="Type")
+        order_tree.heading("Amount", text="Amount")
         order_tree.heading("Price", text="Price")
+        order_tree.heading("Total", text="Total")
+
         order_tree.column("Bean", width=100, anchor="center")
         order_tree.column("Type", width=100, anchor="center")
+        order_tree.column("Amount", width=100, anchor="center")
         order_tree.column("Price", width=100, anchor="center")
+        order_tree.column("Total", width=100, anchor="center")
+
+        # Sample data with matching columns
         data = [
-            ("Arabica", "Whole Bean", "$15.00"),
-            ("Robusta", "Ground", "$12.50"),
-            ("Liberica", "Espresso", "$18.00")
+            ("Arabica", "Whole Bean", "3Kg", "$15.00", "$45.00"),
+            ("Robusta", "Ground", "1Kg", "$12.50", "$12.50"),
+            ("Liberica", "Espresso", "2Kg", "$18.00", "$36.00"),
+            ("", "", "", "Total", "$93.50")  # Summary row
         ]
         for index, row in enumerate(data):
             tag = 'oddrow' if index % 2 == 0 else 'evenrow'
             order_tree.insert("", "end", values=row, tags=(tag,))
 
-        order_tree.tag_configure('oddrow', background='#f0f0f0')
-        order_tree.tag_configure('evenrow', background='#e0e0e0')
+        order_tree.tag_configure('oddrow', background='#f0f0f0', font=("Arial, 14"))
+        order_tree.tag_configure('evenrow', background='#e0e0e0', font=("Arial, 14"))
         order_tree.grid(row=1, column=0, sticky="SWEN", columnspan=5)
 
         add_to_order_button = tk.Button(frame, text="+", font=("Arial", 14), command=lambda: self.notebook.select(2))
