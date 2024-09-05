@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+import csv
 
 
 class MainMenu:
@@ -64,6 +65,73 @@ class MainMenu:
 
 
 #        ViewOrdersGUI(self.parent)
+
+class CsvFileUsage:
+    def __init__(self):
+        self.bean_reg_path = "bean_reg.csv"
+        self.customer_data = "customer_data.csv"
+        self.orders = "orders.csv"
+
+#    def bean_reg(self):
+
+    def customer_data(self):
+        customer_list = []
+        with open(self.bean_reg_path, mode='a+', newline='') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                customer_list.append(row)
+        return customer_list
+#    def orders(self):
+
+
+class ViewOrders:
+
+    def __init__(self, parent):
+        self.parent = parent  # Make sure to pass the parent when creating an instance
+        self.name = tk.StringVar()
+        self.address = tk.StringVar()
+        self.phone_number = tk.StringVar()
+        self.email = tk.StringVar()
+        self.notes = tk.StringVar()
+
+    def customer_details(self):
+        # Setup the frame for the widgets within the parent (main window or another frame)
+        frame = ttk.Frame(self.parent, borderwidth=0, relief="flat")
+        self.frame_config(frame)
+
+        # Initialize the CsvFileUsage instance
+        csv_usage = CsvFileUsage()
+
+        # Load customer data from CSV
+        customer_data = csv_usage.read_customer_data()
+        customer_names = [customer['name'] for customer in customer_data]
+        customer_addresses = [customer['address'] for customer in customer_data]
+        customer_phones = [customer['phone_number'] for customer in customer_data]
+        customer_emails = [customer['email'] for customer in customer_data]
+        customer_notes = [customer['notes'] for customer in customer_data]
+
+        # Populate comboboxes with customer data
+        name_combobox = ttk.Combobox(frame, textvariable=self.name, width=30)
+        name_combobox['values'] = customer_names
+        name_combobox.grid(row=2, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+
+        address_combobox = ttk.Combobox(frame, textvariable=self.address, width=30)
+        address_combobox['values'] = customer_addresses
+        address_combobox.grid(row=3, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+
+        phone_number_combobox = ttk.Combobox(frame, textvariable=self.phone_number, width=30)
+        phone_number_combobox['values'] = customer_phones
+        phone_number_combobox.grid(row=4, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+
+        email_combobox = ttk.Combobox(frame, textvariable=self.email, width=30)
+        email_combobox['values'] = customer_emails
+        email_combobox.grid(row=5, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+
+        notes_combobox = ttk.Combobox(frame, textvariable=self.notes, width=30)
+        notes_combobox['values'] = customer_notes
+        notes_combobox.grid(row=6, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+
+        return frame
 
 
 class OrderingGUI:
