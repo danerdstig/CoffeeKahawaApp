@@ -69,19 +69,23 @@ class MainMenu:
 class CsvFileUsage:
     def __init__(self):
         self.bean_reg_path = "bean_reg.csv"
-        self.customer_data = "customer_data.csv"
-        self.orders = "orders.csv"
+        self.customer_data_path = "customer_data.csv"
+        self.orders_path = "orders.csv"
 
-#    def bean_reg(self):
+    def write_customer_data(self, customer_info):
+        with open(self.customer_data_path, mode='a', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=['name', 'address', 'phone_number', 'email', 'notes'])
+            if file.tell() == 0:  # Check if the file is empty to write the header
+                writer.writeheader()
+            writer.writerow(customer_info)
 
-    def customer_data(self):
+    def read_customer_data(self):
         customer_list = []
-        with open(self.bean_reg_path, mode='a+', newline='') as file:
+        with open(self.customer_data_path, mode='r', newline='') as file:
             reader = csv.DictReader(file)
             for row in reader:
                 customer_list.append(row)
         return customer_list
-#    def orders(self):
 
 
 class ViewOrders:
