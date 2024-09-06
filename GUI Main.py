@@ -60,11 +60,9 @@ class MainMenu:
     def view_order_root_creation(self):
         self.parent.destroy()
         view_order_gui_root = self.create_new_roots.create_view_order_root()
+        ViewOrders(view_order_gui_root)
         view_order_gui_root.mainloop()
-        print("worked")
 
-
-#        ViewOrdersGUI(self.parent)
 
 class CsvFileUsage:
     def __init__(self):
@@ -74,7 +72,7 @@ class CsvFileUsage:
 
     def write_customer_data(self, customer_info):
         with open(self.customer_data_path, mode='a', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=['name', 'address', 'phone_number', 'email', 'notes'])
+            writer = csv.DictWriter(file, fieldnames=['ID', 'name', 'address', 'phone_number', 'email', 'notes'])
             if file.tell() == 0:  # Check if the file is empty to write the header
                 writer.writeheader()
             writer.writerow(customer_info)
@@ -87,55 +85,82 @@ class CsvFileUsage:
                 customer_list.append(row)
         return customer_list
 
+    def write_orders_data(self, orders_info):
+        with open(self.orders_path, mode='a', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=['ID', 'order', 'cost', 'delivery', 'address', 'notes'])
+            if file.tell() == 0:  # Check if the file is empty to write the header
+                writer.writeheader()
+            writer.writerow(orders_info)
+
+    def read_order_data(self):
+        orders_list = []
+        with open(self.orders_path, mode='r', newline='') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                orders_list.append(row)
+        return orders_list
+
+
+import tkinter as tk
+from tkinter import ttk
 
 class ViewOrders:
-
     def __init__(self, parent):
-        self.parent = parent  # Make sure to pass the parent when creating an instance
-        self.name = tk.StringVar()
-        self.address = tk.StringVar()
-        self.phone_number = tk.StringVar()
-        self.email = tk.StringVar()
-        self.notes = tk.StringVar()
-
-    def customer_details(self):
-        # Setup the frame for the widgets within the parent (main window or another frame)
-        frame = ttk.Frame(self.parent, borderwidth=0, relief="flat")
-        self.frame_config(frame)
-
-        # Initialize the CsvFileUsage instance
+        self.parent = parent
         csv_usage = CsvFileUsage()
+        parent.grid_rowconfigure(index=0, weight=1)
 
-        # Load customer data from CSV
-        customer_data = csv_usage.read_customer_data()
-        customer_names = [customer['name'] for customer in customer_data]
-        customer_addresses = [customer['address'] for customer in customer_data]
-        customer_phones = [customer['phone_number'] for customer in customer_data]
-        customer_emails = [customer['email'] for customer in customer_data]
-        customer_notes = [customer['notes'] for customer in customer_data]
+        # Load order data from CSV
+        self.order_data = csv_usage.read_order_data()
+        self.customer_data = csv_usage.read_customer_data()
+        style = ttk.Style()
+        style.configure("Treeview.Heading", background="#e0e0e0", foreground="black", font=("Arial", 11), padding=[0, 5])
+        style.configure("Treeview", rowheight=25)
 
-        # Populate comboboxes with customer data
-        name_combobox = ttk.Combobox(frame, textvariable=self.name, width=30)
-        name_combobox['values'] = customer_names
-        name_combobox.grid(row=2, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+        # Create Treeview widget
+        self.tree = ttk.Treeview(parent, columns=('ID', 'order', 'cost', 'delivery', 'address', 'notes'))
 
-        address_combobox = ttk.Combobox(frame, textvariable=self.address, width=30)
-        address_combobox['values'] = customer_addresses
-        address_combobox.grid(row=3, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+        self.tree.column("#0", width=0, stretch=tk.NO)
+        self.tree.heading("#0", text="")
+        self.tree.heading('ID', text='ID')
+        self.tree.heading('order', text='Order')
+        self.tree.heading('cost', text='Cost')
+        self.tree.heading('delivery', text='Delivery')
+        self.tree.heading('address', text='Address')
+        self.tree.heading('notes', text='Notes')
 
-        phone_number_combobox = ttk.Combobox(frame, textvariable=self.phone_number, width=30)
-        phone_number_combobox['values'] = customer_phones
-        phone_number_combobox.grid(row=4, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+        # Define the column widths
+        self.tree.column('ID', width=75, anchor='w')
+        self.tree.column('order', width=200, anchor='w')
+        self.tree.column('cost', width=75, anchor='w')
+        self.tree.column('delivery', width=75, anchor='w')
+        self.tree.column('address', width=200, anchor='w')
+        self.tree.column('notes', width=100, anchor='w')
 
-        email_combobox = ttk.Combobox(frame, textvariable=self.email, width=30)
-        email_combobox['values'] = customer_emails
-        email_combobox.grid(row=5, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+        self.tree.bind('<ButtonRelease-1>', self.on_row_click)
 
-        notes_combobox = ttk.Combobox(frame, textvariable=self.notes, width=30)
-        notes_combobox['values'] = customer_notes
-        notes_combobox.grid(row=6, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+        # Insert the customer data into the Treeview
+        for order in self.order_data:
+            self.tree.insert('', 'end', values=(
+                order['ID'], order['order'], order['cost'], order['delivery'], order['address'],
+                order['notes']))
 
-        return frame
+        # Add a scrollbar for the Treeview
+        scrollbar = ttk.Scrollbar(parent, orient=tk.VERTICAL, command=self.tree.yview)
+        self.tree.configure(yscroll=scrollbar.set)
+        scrollbar.grid(sticky='NSE', row=0, column=1)
+        self.tree.grid(sticky='SWEN', row=0, column=0)
+
+    def on_row_click(self, event):
+        selected_items = self.tree.selection()
+        if selected_items:
+            item = selected_items[0]  # Get selected item
+            values = self.tree.item(item, 'ID')
+            selected_id = values[0]
+            matching_id = self.customer_data.get(selected_id)
+            label_name = tk.Button(text=f{"ID"})
+
+
 
 
 class OrderingGUI:
