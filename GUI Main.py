@@ -101,8 +101,7 @@ class CsvFileUsage:
         return orders_list
 
 
-import tkinter as tk
-from tkinter import ttk
+
 
 class ViewOrders:
     def __init__(self, parent):
@@ -154,11 +153,11 @@ class ViewOrders:
     def on_row_click(self, event):
         selected_items = self.tree.selection()
         if selected_items:
-            item = selected_items[0]  # Get selected item
-            values = self.tree.item(item, 'ID')
+            item = selected_items[0]
+            values = self.tree.item(item, 'values')
             selected_id = values[0]
-            matching_id = self.customer_data.get(selected_id)
-            label_name = tk.Button(text=f{"ID"})
+            matching_customer = next((customer for customer in self.customer_data if customer['ID'] == selected_id))
+            print(f"Customer Details: {matching_customer['ID']}, {matching_customer['name']}, {matching_customer['address']}, {matching_customer['phone_number']}, {matching_customer['email']}, {matching_customer['notes']}")
 
 
 
