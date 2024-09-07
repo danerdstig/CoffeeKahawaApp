@@ -71,30 +71,30 @@ class CsvFileUsage:
         self.orders_path = "orders.csv"
 
     def write_customer_data(self, customer_info):
-        with open(self.customer_data_path, mode='a', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=['ID', 'name', 'address', 'phone_number', 'email', 'notes'])
+        with open(self.customer_data_path, mode="a", newline="") as file:
+            writer = csv.DictWriter(file, fieldnames=["ID", "name", "address", "phone_number", "email", "notes"])
             if file.tell() == 0:  # Check if the file is empty to write the header
                 writer.writeheader()
             writer.writerow(customer_info)
 
     def read_customer_data(self):
         customer_list = []
-        with open(self.customer_data_path, mode='r', newline='') as file:
+        with open(self.customer_data_path, mode="r", newline="") as file:
             reader = csv.DictReader(file)
             for row in reader:
                 customer_list.append(row)
         return customer_list
 
     def write_orders_data(self, orders_info):
-        with open(self.orders_path, mode='a', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=['ID', 'order', 'cost', 'delivery', 'address', 'notes'])
+        with open(self.orders_path, mode="a", newline="") as file:
+            writer = csv.DictWriter(file, fieldnames=["ID", "order", "cost", "delivery", "address", "notes"])
             if file.tell() == 0:  # Check if the file is empty to write the header
                 writer.writeheader()
             writer.writerow(orders_info)
 
     def read_order_data(self):
         orders_list = []
-        with open(self.orders_path, mode='r', newline='') as file:
+        with open(self.orders_path, mode="r", newline="") as file:
             reader = csv.DictReader(file)
             for row in reader:
                 orders_list.append(row)
@@ -108,6 +108,10 @@ class ViewOrders:
         self.parent = parent
         csv_usage = CsvFileUsage()
         parent.grid_rowconfigure(index=0, weight=1)
+        frame = tk.Frame(parent, borderwidth=0, relief="flat", bg="#e0e0e0")
+        frame.grid(row=0, column=2, sticky="SWEN")
+        parent.grid_columnconfigure(2, weight=1)
+
 
         # Load order data from CSV
         self.order_data = csv_usage.read_order_data()
@@ -117,49 +121,63 @@ class ViewOrders:
         style.configure("Treeview", rowheight=25)
 
         # Create Treeview widget
-        self.tree = ttk.Treeview(parent, columns=('ID', 'order', 'cost', 'delivery', 'address', 'notes'))
+        self.tree = ttk.Treeview(parent, columns=("ID", "order", "cost", "delivery", "address", "notes"))
 
         self.tree.column("#0", width=0, stretch=tk.NO)
         self.tree.heading("#0", text="")
-        self.tree.heading('ID', text='ID')
-        self.tree.heading('order', text='Order')
-        self.tree.heading('cost', text='Cost')
-        self.tree.heading('delivery', text='Delivery')
-        self.tree.heading('address', text='Address')
-        self.tree.heading('notes', text='Notes')
+        self.tree.heading("ID", text="ID")
+        self.tree.heading("order", text="Order")
+        self.tree.heading("cost", text="Cost")
+        self.tree.heading("delivery", text="Delivery")
+        self.tree.heading("address", text="Address")
+        self.tree.heading("notes", text="Notes")
 
         # Define the column widths
-        self.tree.column('ID', width=75, anchor='w')
-        self.tree.column('order', width=200, anchor='w')
-        self.tree.column('cost', width=75, anchor='w')
-        self.tree.column('delivery', width=75, anchor='w')
-        self.tree.column('address', width=200, anchor='w')
-        self.tree.column('notes', width=100, anchor='w')
+        self.tree.column("ID", width=50, anchor="w")
+        self.tree.column("order", width=250, anchor="w")
+        self.tree.column("cost", width=75, anchor="w")
+        self.tree.column("delivery", width=75, anchor="w")
+        self.tree.column("address", width=100, anchor="w")
+        self.tree.column("notes", width=150, anchor="w")
 
-        self.tree.bind('<ButtonRelease-1>', self.on_row_click)
+        self.tree.bind("<ButtonRelease-1>", self.on_row_click)
 
         # Insert the customer data into the Treeview
         for order in self.order_data:
-            self.tree.insert('', 'end', values=(
-                order['ID'], order['order'], order['cost'], order['delivery'], order['address'],
-                order['notes']))
+            self.tree.insert("", "end", values=(
+                order["ID"], order["order"], order["cost"], order["delivery"], order["address"],
+                order["notes"]))
 
         # Add a scrollbar for the Treeview
         scrollbar = ttk.Scrollbar(parent, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscroll=scrollbar.set)
-        scrollbar.grid(sticky='NSE', row=0, column=1)
-        self.tree.grid(sticky='SWEN', row=0, column=0)
+        scrollbar.grid(sticky="NSE", row=0, column=1)
+        self.tree.grid(sticky="SWEN", row=0, column=0)
+
+        self.name_label = tk.Label(frame, text="Name: ", bg="#e0e0e0", font=("Arial, 12"))
+        self.name_label.grid(row=0, column=0, sticky="NW")
+
+        self.address_label = tk.Label(frame, text="Address: ", bg="#e0e0e0", font=("Arial, 12"))
+        self.address_label.grid(row=0, column=0, sticky="NW", pady=(100, 0))
+
+        self.phone_label = tk.Label(frame, text="Phone Number: ", bg="#e0e0e0", font=("Arial, 12"))
+        self.phone_label.grid(row=0, column=0, sticky="NW", pady=(200, 0))
+
+        self.email_label = tk.Label(frame, text="Email: ", bg="#e0e0e0", font=("Arial, 12"))
+        self.email_label.grid(row=0, column=0, sticky="NW", pady=(300, 0))
+
+        self.notes_label = tk.Label(frame, text="Notes: ", bg="#e0e0e0", font=("Arial, 12"))
+        self.notes_label.grid(row=0, column=0, sticky="NW", pady=(400, 0))
 
     def on_row_click(self, event):
         selected_items = self.tree.selection()
         if selected_items:
             item = selected_items[0]
-            values = self.tree.item(item, 'values')
+            values = self.tree.item(item, "values")
             selected_id = values[0]
-            matching_customer = next((customer for customer in self.customer_data if customer['ID'] == selected_id))
-            print(f"Customer Details: {matching_customer['ID']}, {matching_customer['name']}, {matching_customer['address']}, {matching_customer['phone_number']}, {matching_customer['email']}, {matching_customer['notes']}")
-
-
+            matching_customer = next((customer for customer in self.customer_data if customer["ID"] == selected_id), None)
+            if matching_customer:
+                print(f"Customer Details: {matching_customer["ID"]}, {matching_customer["name"]}, {matching_customer["address"]}, {matching_customer["phone_number"]}, {matching_customer["email"]}, {matching_customer["notes"]}")
 
 
 class OrderingGUI:
@@ -267,31 +285,31 @@ class OrderingContentFrames:
         name_label = tk.Label(frame, text="Name:", font=("Arial", 14))
         name_label.grid(row=2, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
         name_combobox = ttk.Combobox(frame, textvariable=self.name, width=30)
-        name_combobox['values'] = ()
+        name_combobox["values"] = ()
         name_combobox.grid(row=2, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
         address_label = tk.Label(frame, text="Delivery Address:", font=("Arial", 14))
         address_label.grid(row=3, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
         address_combobox = ttk.Combobox(frame, textvariable=self.address, width=30)
-        address_combobox['values'] = ()
+        address_combobox["values"] = ()
         address_combobox.grid(row=3, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
         phone_number_label = tk.Label(frame, text="Phone Number:", font=("Arial", 14))
         phone_number_label.grid(row=4, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
         phone_number_combobox = ttk.Combobox(frame, textvariable=self.phone_number, width=30)
-        phone_number_combobox['values'] = ()
+        phone_number_combobox["values"] = ()
         phone_number_combobox.grid(row=4, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
         email_label = tk.Label(frame, text="Email Address:", font=("Arial", 14))
         email_label.grid(row=5, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
         email_combobox = ttk.Combobox(frame, textvariable=self.email, width=30)
-        email_combobox['values'] = ()
+        email_combobox["values"] = ()
         email_combobox.grid(row=5, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
         notes_label = tk.Label(frame, text="Notes:", font=("Arial", 14))
         notes_label.grid(row=6, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
         notes_combobox = ttk.Combobox(frame, textvariable=self.notes, width=30)
-        notes_combobox['values'] = ()
+        notes_combobox["values"] = ()
         notes_combobox.grid(row=6, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
         #       Banner navigation buttons
@@ -411,11 +429,11 @@ class OrderingContentFrames:
             ("", "", "", "", "$93.50")  # Summary row
         ]
         for index, row in enumerate(data):
-            tag = 'oddrow' if index % 2 == 0 else 'evenrow' #checks if remainer == 0 when divided if it is not 0 then it's odd otherwise it's even
+            tag = "oddrow" if index % 2 == 0 else "evenrow" #checks if remainer == 0 when divided if it is not 0 then it"s odd otherwise it"s even
             order_tree.insert("", "end", values=row, tags=(tag,))
 
-        order_tree.tag_configure('oddrow', background='#f0f0f0', font=("Arial, 14"))
-        order_tree.tag_configure('evenrow', background='#e0e0e0', font=("Arial, 14"))
+        order_tree.tag_configure("oddrow", background="#f0f0f0", font=("Arial, 14"))
+        order_tree.tag_configure("evenrow", background="#e0e0e0", font=("Arial, 14"))
         order_tree.grid(row=2, column=0, sticky="SWEN", columnspan=5)
 
         add_to_order_button = tk.Button(frame, text="+", font=("Arial", 14), command=lambda: self.notebook.select(2))
