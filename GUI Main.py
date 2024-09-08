@@ -87,7 +87,7 @@ class CsvFileUsage:
 
     def write_orders_data(self, orders_info):
         with open(self.orders_path, mode="a", newline="") as file:
-            writer = csv.DictWriter(file, fieldnames=["ID", "order", "cost", "delivery", "address", "notes"])
+            writer = csv.DictWriter(file, fieldnames=["date", "ID", "order", "cost", "delivery", "address", "notes"])
             if file.tell() == 0:  # Check if the file is empty to write the header
                 writer.writeheader()
             writer.writerow(orders_info)
@@ -120,11 +120,12 @@ class ViewOrders:
         style.configure("Treeview.Heading", background="#e0e0e0", foreground="black", font=("Arial", 11), padding=[0, 5])
         style.configure("Treeview", rowheight=25)
 
-        # Create Treeview widget
-        self.tree = ttk.Treeview(parent, columns=("ID", "order", "cost", "delivery", "address", "notes"))
+
+        self.tree = ttk.Treeview(parent, columns=("date", "ID", "order", "cost", "delivery", "address", "notes"))
 
         self.tree.column("#0", width=0, stretch=tk.NO)
         self.tree.heading("#0", text="")
+        self.tree.heading("date", text="Date")
         self.tree.heading("ID", text="ID")
         self.tree.heading("order", text="Order")
         self.tree.heading("cost", text="Cost")
@@ -133,9 +134,10 @@ class ViewOrders:
         self.tree.heading("notes", text="Notes")
 
         # Define the column widths
-        self.tree.column("ID", width=50, anchor="w")
-        self.tree.column("order", width=250, anchor="w")
-        self.tree.column("cost", width=75, anchor="w")
+        self.tree.column("date", width=75, anchor="w")
+        self.tree.column("ID", width=25, anchor="w")
+        self.tree.column("order", width=200, anchor="w")
+        self.tree.column("cost", width=50, anchor="w")
         self.tree.column("delivery", width=75, anchor="w")
         self.tree.column("address", width=100, anchor="w")
         self.tree.column("notes", width=150, anchor="w")
@@ -145,40 +147,105 @@ class ViewOrders:
         # Insert the customer data into the Treeview
         for order in self.order_data:
             self.tree.insert("", "end", values=(
-                order["ID"], order["order"], order["cost"], order["delivery"], order["address"],
+                order["date"], order["ID"], order["order"], order["cost"], order["delivery"], order["address"],
                 order["notes"]))
 
-        # Add a scrollbar for the Treeview
+
         scrollbar = ttk.Scrollbar(parent, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscroll=scrollbar.set)
         scrollbar.grid(sticky="NSE", row=0, column=1)
-        self.tree.grid(sticky="SWEN", row=0, column=0)
+        self.tree.grid(sticky="SWEN", row=0, column=0, rowspan=17)
 
+        # ID Field
+        self.id_label = tk.Label(frame, text="ID: ", bg="#e0e0e0", font=("Arial Bold", 12))
+        self.id_label.grid(row=0, column=0, sticky="NW")
+        self.date_label = tk.Label(frame, text="Date: ", bg="#e0e0e0", font=("Arial Bold", 12))
+        self.date_label.grid(row=1, column=0, sticky="NW")
+
+
+        # Name Field
         self.name_label = tk.Label(frame, text="Name: ", bg="#e0e0e0", font=("Arial, 12"))
-        self.name_label.grid(row=0, column=0, sticky="NW")
+        self.name_label.grid(row=2, column=0, sticky="NW")
+        self.name_text = tk.Text(frame, bg="#ffffff", font=("Arial, 12"), height=2)
+        self.name_text.grid(row=3, column=0, sticky="NW", pady=5)
 
+        # Order Field
+        self.order_label = tk.Label(frame, text="Order: ", bg="#e0e0e0", font=("Arial, 12"))
+        self.order_label.grid(row=4, column=0, sticky="NW")
+        self.order_text = tk.Text(frame, bg="#ffffff", font=("Arial, 12"), height=4)
+        self.order_text.grid(row=5, column=0, sticky="NW", pady=5)
+
+        # Cost Field
+        self.cost_label = tk.Label(frame, text="Cost: ", bg="#e0e0e0", font=("Arial, 12"))
+        self.cost_label.grid(row=6, column=0, sticky="NW")
+        self.cost_text = tk.Text(frame, bg="#ffffff", font=("Arial, 12"), height=1)
+        self.cost_text.grid(row=7, column=0, sticky="NW", pady=5)
+
+        # Delivery Field
+        self.delivery_label = tk.Label(frame, text="Delivery: ", bg="#e0e0e0", font=("Arial, 12"))
+        self.delivery_label.grid(row=8, column=0, sticky="NW")
+        self.delivery_text = tk.Text(frame, bg="#ffffff", font=("Arial, 12"), height=2)
+        self.delivery_text.grid(row=9, column=0, sticky="NW", pady=5)
+
+        # Address Field
         self.address_label = tk.Label(frame, text="Address: ", bg="#e0e0e0", font=("Arial, 12"))
-        self.address_label.grid(row=0, column=0, sticky="NW", pady=(100, 0))
+        self.address_label.grid(row=10, column=0, sticky="NW")
+        self.address_text = tk.Text(frame, bg="#ffffff", font=("Arial, 12"), height=2)
+        self.address_text.grid(row=11, column=0, sticky="NW", pady=5)
 
+        # Phone Number Field
         self.phone_label = tk.Label(frame, text="Phone Number: ", bg="#e0e0e0", font=("Arial, 12"))
-        self.phone_label.grid(row=0, column=0, sticky="NW", pady=(200, 0))
+        self.phone_label.grid(row=12, column=0, sticky="NW")
+        self.phone_text = tk.Text(frame, bg="#ffffff", font=("Arial, 12"), height=2)
+        self.phone_text.grid(row=13, column=0, sticky="NW", pady=5)
 
+        # Email Field
         self.email_label = tk.Label(frame, text="Email: ", bg="#e0e0e0", font=("Arial, 12"))
-        self.email_label.grid(row=0, column=0, sticky="NW", pady=(300, 0))
+        self.email_label.grid(row=14, column=0, sticky="NW")
+        self.email_text = tk.Text(frame, bg="#ffffff", font=("Arial, 12"), height=2)
+        self.email_text.grid(row=15, column=0, sticky="NW", pady=5)
 
+        # Notes Field
         self.notes_label = tk.Label(frame, text="Notes: ", bg="#e0e0e0", font=("Arial, 12"))
-        self.notes_label.grid(row=0, column=0, sticky="NW", pady=(400, 0))
+        self.notes_label.grid(row=16, column=0, sticky="NW")
+        self.notes_text = tk.Text(frame, bg="#ffffff", font=("Arial, 12"), height=3)
+        self.notes_text.grid(row=17, column=0, sticky="NW", pady=5)
 
     def on_row_click(self, event):
         selected_items = self.tree.selection()
         if selected_items:
             item = selected_items[0]
             values = self.tree.item(item, "values")
-            selected_id = values[0]
-            matching_customer = next((customer for customer in self.customer_data if customer["ID"] == selected_id), None)
-            if matching_customer:
-                print(f"Customer Details: {matching_customer["ID"]}, {matching_customer["name"]}, {matching_customer["address"]}, {matching_customer["phone_number"]}, {matching_customer["email"]}, {matching_customer["notes"]}")
+            selected_id = values[1] 
 
+            matching_customer = next((customer for customer in self.customer_data if customer["ID"] == selected_id),
+                                     None)
+            matching_order = next((order for order in self.order_data if order["ID"] == selected_id), None)
+
+            if matching_customer and matching_order:
+                # Clears data
+                self.id_label.config(text="ID: ")
+                self.date_label.config(text="Order: ")
+                self.name_text.delete(1.0, tk.END)
+                self.order_text.delete(1.0, tk.END)
+                self.cost_text.delete(1.0, tk.END)
+                self.delivery_text.delete(1.0, tk.END)
+                self.address_text.delete(1.0, tk.END)
+                self.phone_text.delete(1.0, tk.END)
+                self.email_text.delete(1.0, tk.END)
+                self.notes_text.delete(1.0, tk.END)
+
+                # Inserts data
+                self.id_label.config(text=f"ID: {matching_customer["ID"]}")
+                self.date_label.config(text=f"Order:  {matching_order["date"]}")
+                self.name_text.insert(1.0, matching_customer["name"])
+                self.order_text.insert(1.0, matching_order["order"])
+                self.cost_text.insert(1.0, matching_order["cost"])
+                self.delivery_text.insert(1.0, matching_order["delivery"])
+                self.address_text.insert(1.0, matching_customer["address"])
+                self.phone_text.insert(1.0, matching_customer["phone_number"])
+                self.email_text.insert(1.0, matching_customer["email"])
+                self.notes_text.insert(1.0, matching_order["notes"])
 
 class OrderingGUI:
     def __init__(self, parent, create_new_roots):
