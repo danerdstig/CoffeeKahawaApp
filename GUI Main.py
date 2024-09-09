@@ -4,6 +4,7 @@ import csv
 from datetime import datetime
 
 class MainMenu:
+
     def __init__(self, parent, create_new_roots):
         self.parent = parent
         self.create_new_roots = create_new_roots
@@ -100,7 +101,6 @@ class CsvFileUsage:
                 writer.writeheader()
             writer.writerow(orders_info)
 
-
     def read_order_data(self):
         orders_list = []
         with open(self.orders_path, mode="r", newline="") as file:
@@ -109,7 +109,14 @@ class CsvFileUsage:
                 orders_list.append(row)
         return orders_list
 
+    def get_next_id(self, customer_info):
+        last_id = 0
+        with open(self.customer_data_path, mode='r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                last_id = int(row['ID'])  # Assumes the 'ID' field exists and is an integer
 
+        return last_id + 1
 
 
 class ViewOrders:
@@ -265,6 +272,7 @@ class ViewOrders:
         MainMenu(main_menu_root, self.create_new_roots)
         main_menu_root.mainloop()
 
+
 class OrderingGUI:
     def __init__(self, parent, create_new_roots):
         self.parent = parent
@@ -280,9 +288,9 @@ class OrderingGUI:
 
         content_frames = OrderingContentFrames(self.notebook, parent, self.create_new_roots)
         frame0 = content_frames.main_menu()
-        frame1 = content_frames.customer_details()
-        frame2 = content_frames.bean_ordering()
-        frame3 = content_frames.confirm_order()
+        frame1 = content_frames.customer_details_tab()
+        frame2 = content_frames.bean_ordering_tab()
+        frame3 = content_frames.confirm_order_tab()
 
         self.notebook.add(frame0, text="⌂")
         self.notebook.add(frame1, text="Collection Information")
@@ -322,6 +330,9 @@ class OrderingContentFrames:
         self.calculated_cost = 0
         self.orders_info = []
         self.order_tree = None
+        self.last_id = 0
+        self.customer_info = []
+
         #       setting RadioButton Style
         self.style = ttk.Style()
         self.style.configure("Custom.TRadiobutton", font=("Arial", 14))
@@ -353,51 +364,54 @@ class OrderingContentFrames:
         MainMenu(main_menu_root, self.create_new_roots)
         main_menu_root.mainloop()
 
-    def customer_details(self):
+    def customer_details_tab(self):
         #       Setup the frame for the widgets
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
         self.frame_config(frame)
 
         #       Delivery Or pickup - this will be a logic gate once I create the database
         pickup_or_delivery_label = tk.Label(frame, text="Pickup or Delivery?:", font=("Arial", 14))
-        pickup_or_delivery_label.grid(row=1, column=0, sticky="NW", columnspan=2, padx=5)
+        pickup_or_delivery_label.grid(row=0, column=0, sticky="SNW", columnspan=2, padx=5, pady=(100, 0))
         pickup_radio = ttk.Radiobutton(frame, text="Pickup", variable=self.pickup_or_delivery, value="Pickup",
                                        style="Custom.TRadiobutton", takefocus=0)
-        pickup_radio.grid(row=1, column=1, sticky="NW", columnspan=2, padx=(100, 0))
+        pickup_radio.grid(row=0, column=1, sticky="SNW", columnspan=2, padx=(100, 0), pady=(100, 0))
         delivery_radio = ttk.Radiobutton(frame, text="Delivery", variable=self.pickup_or_delivery, value="Delivery",
                                          style="Custom.TRadiobutton", takefocus=0)
-        delivery_radio.grid(row=1, column=1, sticky="NW", padx=(200, 0), columnspan=2)
+        delivery_radio.grid(row=0, column=1, sticky="SNW", padx=(200, 0), columnspan=2, pady=(100, 0))
 
         #       Contact details
         name_label = tk.Label(frame, text="Name:", font=("Arial", 14))
-        name_label.grid(row=2, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
+        name_label.grid(row=1, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
         name_combobox = ttk.Combobox(frame, textvariable=self.name, width=30)
         name_combobox["values"] = ()
-        name_combobox.grid(row=2, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+        name_combobox.grid(row=1, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
         address_label = tk.Label(frame, text="Delivery Address:", font=("Arial", 14))
-        address_label.grid(row=3, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
+        address_label.grid(row=2, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
         address_combobox = ttk.Combobox(frame, textvariable=self.address, width=30)
         address_combobox["values"] = ()
-        address_combobox.grid(row=3, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+        address_combobox.grid(row=2, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
         phone_number_label = tk.Label(frame, text="Phone Number:", font=("Arial", 14))
-        phone_number_label.grid(row=4, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
+        phone_number_label.grid(row=3, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
         phone_number_combobox = ttk.Combobox(frame, textvariable=self.phone_number, width=30)
         phone_number_combobox["values"] = ()
-        phone_number_combobox.grid(row=4, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+        phone_number_combobox.grid(row=3, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
         email_label = tk.Label(frame, text="Email Address:", font=("Arial", 14))
-        email_label.grid(row=5, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
+        email_label.grid(row=4, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
         email_combobox = ttk.Combobox(frame, textvariable=self.email, width=30)
         email_combobox["values"] = ()
-        email_combobox.grid(row=5, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+        email_combobox.grid(row=4, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
         notes_label = tk.Label(frame, text="Notes:", font=("Arial", 14))
-        notes_label.grid(row=6, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
+        notes_label.grid(row=5, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
         notes_combobox = ttk.Combobox(frame, textvariable=self.notes, width=30)
         notes_combobox["values"] = ()
-        notes_combobox.grid(row=6, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+        notes_combobox.grid(row=5, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
+
+        next_button = tk.Button(frame, text="Next", width=10, font=("Arial, 14"), command=self.customer_create)
+        next_button.grid(row=6, column=0, columnspan=2, sticky="SNW", pady=5)
 
 
 
@@ -415,7 +429,21 @@ class OrderingContentFrames:
 
         return frame
 
-    def bean_ordering(self):
+    def customer_create(self):
+
+        customer_info = {
+            "ID": f"{CsvFileUsage().get_next_id(self.customer_info)}",
+            "name": self.name.get(),
+            "phone number": self.phone_number,
+            "email": self.email.get(),
+            "address": self.address.get(),
+            "notes": self.notes.get()
+        }
+
+        self.customer_info.append(customer_info)  # Update orders_info
+        self.notebook.select(2)
+
+    def bean_ordering_tab(self):
         #       Setup the frame for the widgets
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
 
@@ -494,7 +522,7 @@ class OrderingContentFrames:
         order_info = {
             "date": f"{datetime.now().strftime('%Y-%m-%d')}",
             "ID": "some_unique_id",
-            "order": f"{self.bean.get()} ({self.bean_colour.get()}), {self.whole_or_ground.get()}",
+            "order": f"{self.bean.get()} ({self.bean_colour.get()}), {self.whole_or_ground.get()}, {self.bean_amount.get()} Kg",
             "cost": f"${self.calculated_cost:.2f}",
             "delivery": self.pickup_or_delivery.get(),
             "address": self.address.get(),
@@ -507,16 +535,15 @@ class OrderingContentFrames:
 
     def update_treeview(self):
         # Clear the existing items
-        self.order_tree.delete(*self.tree.get_children())
+        self.order_tree.delete(*self.order_tree.get_children())
 
         # Insert new items
-        for index, row in enumerate(self.orders):
+        for index, row in enumerate(self.orders_info):
             tag = "oddrow" if index % 2 == 0 else "evenrow"
             self.order_tree.insert("", "end", values=(
-            row["date"], row["ID"], row["order"], row["cost"], row["delivery"], row["address"], row["notes"]),
-                             tags=(tag,))
+            row["order"], row["cost"]), tags=(tag,))
 
-    def confirm_order(self):
+    def confirm_order_tab(self):
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
         self.frame_config(frame)
 
@@ -528,29 +555,16 @@ class OrderingContentFrames:
         order_label = tk.Label(frame, text="Order Summary:", font=("Arial", 14))
         order_label.grid(row=1, column=0, sticky="NW", columnspan=2)
 
-        self.order_tree = ttk.Treeview(frame, columns=("date", "ID", "order", "cost", "delivery", "address", "notes"),
-                                       show="headings", height=5)
-        self.order_tree.heading("date", text="Date")
-        self.order_tree.heading("ID", text="ID")
+        self.order_tree = ttk.Treeview(frame, columns=("order", "cost"), show="headings", height=5)
         self.order_tree.heading("order", text="Order")
         self.order_tree.heading("cost", text="Cost")
-        self.order_tree.heading("delivery", text="Delivery")
-        self.order_tree.heading("address", text="Address")
-        self.order_tree.heading("notes", text="Notes")
-
-        self.order_tree.column("date", width=100, anchor="center")
-        self.order_tree.column("ID", width=100, anchor="center")
-        self.order_tree.column("order", width=200, anchor="center")
+        self.order_tree.column("order", width=300, anchor="center")
         self.order_tree.column("cost", width=75, anchor="center")
-        self.order_tree.column("delivery", width=100, anchor="center")
-        self.order_tree.column("address", width=150, anchor="center")
-        self.order_tree.column("notes", width=150, anchor="center")
 
         for index, row in enumerate(self.orders_info):
             tag = "oddrow" if index % 2 == 0 else "evenrow"
             self.order_tree.insert("", "end", values=(
-                row["date"], row["ID"], row["order"], row["cost"], row["delivery"], row["address"], row["notes"]),
-                                   tags=(tag,))
+                row["order"], row["cost"]), tags=(tag,))
 
         self.order_tree.tag_configure("oddrow", background="#f0f0f0", font=("Arial", 14))
         self.order_tree.tag_configure("evenrow", background="#e0e0e0", font=("Arial", 14))
@@ -578,6 +592,8 @@ class OrderingContentFrames:
         banner.lower()
 
         return frame
+
+    def add_info_to_csv(self):
 
 
 class CreateNewRoots:
