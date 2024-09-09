@@ -81,9 +81,13 @@ class CsvFileUsage:
 
     def write_customer_data(self, customer_info):
         with open(self.customer_data_path, mode="a", newline="") as file:
+            headers = ["ID", "name", "address", "phone_number", "email", "notes"]
             writer = csv.DictWriter(file, fieldnames=["ID", "name", "address", "phone_number", "email", "notes"])
             if file.tell() == 0:  # Check if the file is empty to write the header
                 writer.writeheader()
+            customer_to_append = [dict(zip(headers, row)) for row in writer]
+            writer.writerow(customer_to_append)
+
             writer.writerow(customer_info)
 
     def read_customer_data(self):
@@ -96,10 +100,12 @@ class CsvFileUsage:
 
     def write_orders_data(self, orders_info):
         with open(self.orders_path, mode="a", newline="") as file:
+            headers = ["date", "ID", "order", "cost", "delivery", "address", "notes"]
             writer = csv.DictWriter(file, fieldnames=["date", "ID", "order", "cost", "delivery", "address", "notes"])
             if file.tell() == 0:  # Check if the file is empty to write the header
                 writer.writeheader()
-            writer.writerow(orders_info)
+            order_to_append = [dict(zip(headers, row)) for row in orders_info]
+            writer.writerow(order_to_append)
 
     def read_order_data(self):
         orders_list = []
@@ -578,7 +584,7 @@ class OrderingContentFrames:
         cancel_button = tk.Button(frame, text="Cancel Order", font=("Arial", 14), height=2)
         cancel_button.grid(row=7, column=0, columnspan=2, sticky="SW", pady=(0, 10))
 
-        confirm_button = tk.Button(frame, text="Confirm Order", font=("Arial", 14), height=2)
+        confirm_button = tk.Button(frame, text="Confirm Order", font=("Arial", 14), height=2, command=self.add_info_to_csv)
         confirm_button.grid(row=7, column=3, columnspan=2, sticky="SE", pady=(0, 10))
 
         back_button = tk.Button(frame, text="←", font="80", width=7, height=3, command=lambda: self.notebook.select(2))
@@ -594,6 +600,9 @@ class OrderingContentFrames:
         return frame
 
     def add_info_to_csv(self):
+        CsvFileUsage().write_orders_data(self.orders_info)
+        CsvFileUsage.write_customer_data(self.customer_info)
+
 
 
 class CreateNewRoots:
