@@ -3,6 +3,7 @@ from tkinter import ttk
 import csv
 from datetime import datetime
 
+
 class MainMenu:
 
     def __init__(self, parent, create_new_roots):
@@ -82,12 +83,7 @@ class CsvFileUsage:
     def write_customer_data(self, customer_info):
         with open(self.customer_data_path, mode="a", newline="") as file:
             headers = ["ID", "name", "address", "phone_number", "email", "notes"]
-            writer = csv.DictWriter(file, fieldnames=["ID", "name", "address", "phone_number", "email", "notes"])
-            if file.tell() == 0:  # Check if the file is empty to write the header
-                writer.writeheader()
-            customer_to_append = [dict(zip(headers, row)) for row in writer]
-            writer.writerow(customer_to_append)
-
+            writer = csv.DictWriter(file, fieldnames=headers)
             writer.writerow(customer_info)
 
     def read_customer_data(self):
@@ -101,11 +97,8 @@ class CsvFileUsage:
     def write_orders_data(self, orders_info):
         with open(self.orders_path, mode="a", newline="") as file:
             headers = ["date", "ID", "order", "cost", "delivery", "address", "notes"]
-            writer = csv.DictWriter(file, fieldnames=["date", "ID", "order", "cost", "delivery", "address", "notes"])
-            if file.tell() == 0:  # Check if the file is empty to write the header
-                writer.writeheader()
-            order_to_append = [dict(zip(headers, row)) for row in orders_info]
-            writer.writerow(order_to_append)
+            writer = csv.DictWriter(file, fieldnames=headers)
+            writer.writerow(orders_info)
 
     def read_order_data(self):
         orders_list = []
@@ -446,7 +439,7 @@ class OrderingContentFrames:
             "notes": self.notes.get()
         }
 
-        self.customer_info.append(customer_info)  # Update orders_info
+        self.customer_info.append(customer_info)
         self.notebook.select(2)
 
     def bean_ordering_tab(self):
@@ -522,7 +515,7 @@ class OrderingContentFrames:
 
     def add_to_order(self):
         bean_prices = {"Arabica": 38.50, "Robusta": 38.50, "Liberica": 33.50, "Excelsa": 33.50}
-        self.calculated_cost = bean_prices.get(self.bean.get(), 33.50) * self.bean_amount.get() + (
+        self.calculated_cost = bean_prices.get(self.bean.get()) * self.bean_amount.get() + (
             5 if self.pickup_or_delivery.get() == "Delivery" else 0)
 
         order_info = {
@@ -601,7 +594,7 @@ class OrderingContentFrames:
 
     def add_info_to_csv(self):
         CsvFileUsage().write_orders_data(self.orders_info)
-        CsvFileUsage.write_customer_data(self.customer_info)
+        CsvFileUsage().write_customer_data(self.customer_info)
 
 
 
