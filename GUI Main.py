@@ -83,11 +83,7 @@ class CsvFileUsage:
     def write_customer_data(self, customer_info):
         with open(self.customer_data_path, mode="a", newline="") as file:
             writer = csv.writer(file)
-
-            # Extract the values from the dictionary and write them as a row
-            if isinstance(customer_info, dict):
-                writer.writerow(customer_info.values())
-
+            writer.writerow(customer_info)
     def read_customer_data(self):
         customer_list = []
         with open(self.customer_data_path, mode="r", newline="") as file:
@@ -99,10 +95,7 @@ class CsvFileUsage:
     def write_orders_data(self, orders_info):
         with open(self.orders_path, mode="a", newline="") as file:
             writer = csv.writer(file)
-
-            # Extract the values from the dictionary and write them as a row
-            if isinstance(orders_info, dict):
-                writer.writerow(orders_info.values())
+            writer.writerow(orders_info)
 
     def read_order_data(self):
         orders_list = []
