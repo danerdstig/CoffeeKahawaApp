@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import csv
 from datetime import datetime
+from dataclasses import dataclass, field
 
 
 class MainMenu:
@@ -79,11 +80,6 @@ class CsvFileUsage:
             for row in reader:
                 bean_list.append(row)
         return bean_list
-
-    def write_customer_data(self, customer_info):
-        with open(self.customer_data_path, mode="a", newline="") as file:
-            writer = csv.writer(file)
-            writer.writerow(customer_info)
     def read_customer_data(self):
         customer_list = []
         with open(self.customer_data_path, mode="r", newline="") as file:
@@ -91,11 +87,6 @@ class CsvFileUsage:
             for row in reader:
                 customer_list.append(row)
         return customer_list
-
-    def write_orders_data(self, orders_info):
-        with open(self.orders_path, mode="a", newline="") as file:
-            writer = csv.writer(file)
-            writer.writerow(orders_info)
 
     def read_order_data(self):
         orders_list = []
@@ -105,12 +96,22 @@ class CsvFileUsage:
                 orders_list.append(row)
         return orders_list
 
-    def get_next_id(self, customer_info):
+    def write_customer_data(self, customer_info):
+        with open(self.customer_data_path, mode="a", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(customer_info)
+
+    def write_order_data(self, order_info):
+        with open(self.orders_path, mode="a", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(order_info)
+
+    def get_next_id(self):
         last_id = 0
         with open(self.customer_data_path, mode='r') as file:
             reader = csv.DictReader(file)
-            for row in reader:
-                last_id = int(row['ID'])  # Assumes the 'ID' field exists and is an integer
+            for _ in reader:
+                last_id += 1
 
         return last_id + 1
 
@@ -131,7 +132,6 @@ class ViewOrders:
         style = ttk.Style()
         style.configure("Treeview.Heading", background="#e0e0e0", foreground="black", font=("Arial", 11), padding=[0, 5])
         style.configure("Treeview", rowheight=25)
-
 
         self.tree = ttk.Treeview(parent, columns=("date", "ID", "order", "cost", "delivery", "address", "notes"))
 
@@ -273,7 +273,7 @@ class OrderingGUI:
     def __init__(self, parent, create_new_roots):
         self.parent = parent
         self.create_new_roots = create_new_roots
-
+        self.csvfile = CsvFileUsage()
         self.notebook = ttk.Notebook(parent)
         self.notebook.grid(row=1, column=0, sticky="NSEW")
         parent.grid_rowconfigure(1, weight=1)
@@ -313,21 +313,10 @@ class OrderingContentFrames:
         self.notebook = notebook
         self.parent = parent
         self.create_new_roots = create_new_roots
-        self.pickup_or_delivery = tk.StringVar(value="N/A")
-        self.name = tk.StringVar(value="")
-        self.address = tk.StringVar(value="")
-        self.phone_number = tk.StringVar(value="")
-        self.notes = tk.StringVar(value="")
-        self.email = tk.StringVar(value="")
-        self.bean = tk.StringVar(value="N/A")
-        self.whole_or_ground = tk.StringVar(value="N/A")
-        self.bean_colour = tk.StringVar(value="N/A")
-        self.bean_amount = tk.IntVar()
-        self.calculated_cost = 0
-        self.orders_info = []
         self.order_tree = None
-        self.last_id = 0
-        self.customer_info = []
+        self.order = OrderInfo()
+        self.customer = CustomerInfo()
+        self.csvfile = CsvFileUsage()
 
         #       setting RadioButton Style
         self.style = ttk.Style()
@@ -368,41 +357,41 @@ class OrderingContentFrames:
         #       Delivery Or pickup - this will be a logic gate once I create the database
         pickup_or_delivery_label = tk.Label(frame, text="Pickup or Delivery?:", font=("Arial", 14))
         pickup_or_delivery_label.grid(row=0, column=0, sticky="SNW", columnspan=2, padx=5, pady=(100, 0))
-        pickup_radio = ttk.Radiobutton(frame, text="Pickup", variable=self.pickup_or_delivery, value="Pickup",
+        pickup_radio = ttk.Radiobutton(frame, text="Pickup", variable=self.order.pickup_or_delivery, value="Pickup",
                                        style="Custom.TRadiobutton", takefocus=0)
         pickup_radio.grid(row=0, column=1, sticky="SNW", columnspan=2, padx=(100, 0), pady=(100, 0))
-        delivery_radio = ttk.Radiobutton(frame, text="Delivery", variable=self.pickup_or_delivery, value="Delivery",
+        delivery_radio = ttk.Radiobutton(frame, text="Delivery", variable=self.order.pickup_or_delivery, value="Delivery",
                                          style="Custom.TRadiobutton", takefocus=0)
         delivery_radio.grid(row=0, column=1, sticky="SNW", padx=(200, 0), columnspan=2, pady=(100, 0))
 
         #       Contact details
         name_label = tk.Label(frame, text="Name:", font=("Arial", 14))
         name_label.grid(row=1, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
-        name_combobox = ttk.Combobox(frame, textvariable=self.name, width=30)
+        name_combobox = ttk.Combobox(frame, textvariable=self.customer.name, width=30)
         name_combobox["values"] = ()
         name_combobox.grid(row=1, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
         address_label = tk.Label(frame, text="Delivery Address:", font=("Arial", 14))
         address_label.grid(row=2, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
-        address_combobox = ttk.Combobox(frame, textvariable=self.address, width=30)
+        address_combobox = ttk.Combobox(frame, textvariable=self.customer.address, width=30)
         address_combobox["values"] = ()
         address_combobox.grid(row=2, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
         phone_number_label = tk.Label(frame, text="Phone Number:", font=("Arial", 14))
         phone_number_label.grid(row=3, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
-        phone_number_combobox = ttk.Combobox(frame, textvariable=self.phone_number, width=30)
+        phone_number_combobox = ttk.Combobox(frame, textvariable=self.customer.phone_number, width=30)
         phone_number_combobox["values"] = ()
         phone_number_combobox.grid(row=3, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
         email_label = tk.Label(frame, text="Email Address:", font=("Arial", 14))
         email_label.grid(row=4, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
-        email_combobox = ttk.Combobox(frame, textvariable=self.email, width=30)
+        email_combobox = ttk.Combobox(frame, textvariable=self.customer.email, width=30)
         email_combobox["values"] = ()
         email_combobox.grid(row=4, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
         notes_label = tk.Label(frame, text="Notes:", font=("Arial", 14))
         notes_label.grid(row=5, column=0, sticky="NSW", columnspan=2, padx=5, pady=5)
-        notes_combobox = ttk.Combobox(frame, textvariable=self.notes, width=30)
+        notes_combobox = ttk.Combobox(frame, textvariable=self.customer.notes, width=30)
         notes_combobox["values"] = ()
         notes_combobox.grid(row=5, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
@@ -428,15 +417,15 @@ class OrderingContentFrames:
     def customer_create(self):
 
         customer_info = {
-            "ID": f"{CsvFileUsage().get_next_id(self.customer_info)}",
-            "name": self.name.get(),
-            "phone number": self.phone_number,
-            "email": self.email.get(),
-            "address": self.address.get(),
-            "notes": self.notes.get()
+            "ID": self.csvfile.get_next_id(),
+            "name": self.customer.name.get(),
+            "phone number": self.customer.phone_number.get(),
+            "email": self.customer.email.get(),
+            "address": self.customer.address.get(),
+            "notes": self.customer.notes.get()
         }
 
-        self.customer_info.append(customer_info)
+        self.csvfile.write_customer_data(customer_info)
         self.notebook.select(2)
 
     def bean_ordering_tab(self):
@@ -448,48 +437,48 @@ class OrderingContentFrames:
         #       logic gate for which bean is to be ordered
         bean_label = tk.Label(frame, text="Bean type:", font=("Arial", 14))
         bean_label.grid(row=1, column=0, sticky="NW", columnspan=2, padx=5)
-        arabica_radio = ttk.Radiobutton(frame, text="Arabica", variable=self.bean, value="Arabica",
+        arabica_radio = ttk.Radiobutton(frame, text="Arabica", variable=self.order.bean, value="Arabica",
                                         style="Custom.TRadiobutton", takefocus=0)
         arabica_radio.grid(row=1, column=1, sticky="NW", columnspan=2, padx=(50, 0))
-        robusta_radio = ttk.Radiobutton(frame, text="Robusta", variable=self.bean, value="Robusta",
+        robusta_radio = ttk.Radiobutton(frame, text="Robusta", variable=self.order.bean, value="Robusta",
                                         style="Custom.TRadiobutton", takefocus=0)
         robusta_radio.grid(row=1, column=1, sticky="NW", padx=(150, 0), columnspan=2)
-        liberica_radio = ttk.Radiobutton(frame, text="Liberica", variable=self.bean, value="Liberica",
+        liberica_radio = ttk.Radiobutton(frame, text="Liberica", variable=self.order.bean, value="Liberica",
                                          style="Custom.TRadiobutton", takefocus=0)
         liberica_radio.grid(row=1, column=1, sticky="NW", columnspan=2, padx=(250, 0))
-        exclesa_radio = ttk.Radiobutton(frame, text="Excelsa", variable=self.bean, value="Excelsa",
+        exclesa_radio = ttk.Radiobutton(frame, text="Excelsa", variable=self.order.bean, value="Excelsa",
                                         style="Custom.TRadiobutton", takefocus=0)
         exclesa_radio.grid(row=1, column=1, sticky="NW", columnspan=2, padx=(350, 0))
 
         # Bean colour section
         bean_colour_label = tk.Label(frame, text="Bean colour:", font=("Arial", 14))
         bean_colour_label.grid(row=2, column=0, sticky="NW", columnspan=2, pady=(20, 0), padx=5)
-        light_radio = ttk.Radiobutton(frame, text="Light", variable=self.bean_colour, value="Light",
+        light_radio = ttk.Radiobutton(frame, text="Light", variable=self.order.bean_colour, value="Light",
                                       style="Custom.TRadiobutton", takefocus=0)
         light_radio.grid(row=2, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(50, 0))
-        medium_radio = ttk.Radiobutton(frame, text="Medium", variable=self.bean_colour, value="Medium",
+        medium_radio = ttk.Radiobutton(frame, text="Medium", variable=self.order.bean_colour, value="Medium",
                                        style="Custom.TRadiobutton", takefocus=0)
         medium_radio.grid(row=2, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(150, 0))
-        dark_radio = ttk.Radiobutton(frame, text="Dark", variable=self.bean_colour, value="Dark",
+        dark_radio = ttk.Radiobutton(frame, text="Dark", variable=self.order.bean_colour, value="Dark",
                                      style="Custom.TRadiobutton", takefocus=0)
         dark_radio.grid(row=2, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(250, 0))
-        extra_dark_radio = ttk.Radiobutton(frame, text="Extra Dark", variable=self.bean_colour, value="Extra Dark",
+        extra_dark_radio = ttk.Radiobutton(frame, text="Extra Dark", variable=self.order.bean_colour, value="Extra Dark",
                                            style="Custom.TRadiobutton", takefocus=0)
         extra_dark_radio.grid(row=2, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(350, 0))
 
         # Whole or Ground section
         whole_or_ground_label = tk.Label(frame, text="Whole or Ground?:", font=("Arial", 14))
         whole_or_ground_label.grid(row=3, column=0, sticky="NW", columnspan=2, pady=(20, 0), padx=5)
-        whole_radio = ttk.Radiobutton(frame, text="Whole", variable=self.whole_or_ground, value="Whole",
+        whole_radio = ttk.Radiobutton(frame, text="Whole", variable=self.order.whole_or_ground, value="Whole",
                                       style="Custom.TRadiobutton", takefocus=0)
         whole_radio.grid(row=3, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(150, 0))
-        ground_radio = ttk.Radiobutton(frame, text="Ground", variable=self.whole_or_ground, value="Ground",
+        ground_radio = ttk.Radiobutton(frame, text="Ground", variable=self.order.whole_or_ground, value="Ground",
                                        style="Custom.TRadiobutton", takefocus=0)
         ground_radio.grid(row=3, column=1, sticky="NW", columnspan=2, pady=(20, 0), padx=(250, 0))
 
         amount_label = tk.Label(frame, text="Amount:", font=("Arial", 14))
         amount_label.grid(row=4, column=0, sticky="NW", pady=(20, 0), columnspan=2, padx=5)
-        amount_spinbox = ttk.Spinbox(frame, from_=0, to=5, textvariable=self.bean_amount, width=30)
+        amount_spinbox = ttk.Spinbox(frame, from_=0, to=5, textvariable=self.order.bean_amount, width=30)
         amount_spinbox.grid(row=4, column=1, sticky="NW", pady=(20, 0), padx=(25, 0))
 
         add_to_order_button = tk.Button(frame, text="+", font=("Arial", 14), command=self.add_to_order)
@@ -512,32 +501,39 @@ class OrderingContentFrames:
 
     def add_to_order(self):
         bean_prices = {"Arabica": 38.50, "Robusta": 38.50, "Liberica": 33.50, "Excelsa": 33.50}
-        self.calculated_cost = bean_prices.get(self.bean.get()) * self.bean_amount.get() + (
-            5 if self.pickup_or_delivery.get() == "Delivery" else 0)
+
+        # Get the selected bean type
+        selected_bean_type = self.order.bean.get()
+        print(f"Selected bean type: {selected_bean_type}")  # Debugging line
+
+        # Retrieve the price based on selected bean type
+        self.bean_price = bean_prices.get(selected_bean_type)
+        self.order.calculated_cost = (self.bean_price) * self.order.bean_amount.get() + (
+            5 if self.order.pickup_or_delivery.get() == "Delivery" else 0)
+
 
         order_info = {
             "date": f"{datetime.now().strftime('%Y-%m-%d')}",
-            "ID": "some_unique_id",
-            "order": f"{self.bean.get()} ({self.bean_colour.get()}), {self.whole_or_ground.get()}, {self.bean_amount.get()} Kg",
-            "cost": f"${self.calculated_cost:.2f}",
-            "delivery": self.pickup_or_delivery.get(),
-            "address": self.address.get(),
-            "notes": self.notes.get()
+            "ID": self.csvfile.get_next_id(),
+            "order": f"{self.order.bean.get()} ({self.order.bean_colour.get()}), {self.order.whole_or_ground.get()}, {self.order.bean_amount.get()} Kg",
+            "cost": f"${self.order.calculated_cost:.2f}",
+            "delivery": self.order.pickup_or_delivery.get(),
+            "address": self.customer.address.get(),
+            "notes": self.customer.notes.get()
         }
 
-        self.orders_info.append(order_info)  # Update orders_info
-        self.update_treeview()
+        self.csvfile.write_order_data(order_info)
+        self.update_treeview(order_info)
         self.notebook.select(3)
 
-    def update_treeview(self):
+    def update_treeview(self, order_info):
         # Clear the existing items
         self.order_tree.delete(*self.order_tree.get_children())
 
         # Insert new items
-        for index, row in enumerate(self.orders_info):
-            tag = "oddrow" if index % 2 == 0 else "evenrow"
+        for index, row in enumerate(order_info):
             self.order_tree.insert("", "end", values=(
-            row["order"], row["cost"]), tags=(tag,))
+        order_info["order"], order_info["cost"]))
 
     def confirm_order_tab(self):
         frame = ttk.Frame(self.notebook, borderwidth=0, relief="flat")
@@ -556,14 +552,6 @@ class OrderingContentFrames:
         self.order_tree.heading("cost", text="Cost")
         self.order_tree.column("order", width=300, anchor="center")
         self.order_tree.column("cost", width=75, anchor="center")
-
-        for index, row in enumerate(self.orders_info):
-            tag = "oddrow" if index % 2 == 0 else "evenrow"
-            self.order_tree.insert("", "end", values=(
-                row["order"], row["cost"]), tags=(tag,))
-
-        self.order_tree.tag_configure("oddrow", background="#f0f0f0", font=("Arial", 14))
-        self.order_tree.tag_configure("evenrow", background="#e0e0e0", font=("Arial", 14))
         self.order_tree.grid(row=2, column=0, sticky="SWEN", columnspan=5)
 
         add_to_order_button = tk.Button(frame, text="+", font=("Arial", 14), command=lambda: self.notebook.select(2))
@@ -574,7 +562,7 @@ class OrderingContentFrames:
         cancel_button = tk.Button(frame, text="Cancel Order", font=("Arial", 14), height=2)
         cancel_button.grid(row=7, column=0, columnspan=2, sticky="SW", pady=(0, 10))
 
-        confirm_button = tk.Button(frame, text="Confirm Order", font=("Arial", 14), height=2, command=self.add_info_to_csv)
+        confirm_button = tk.Button(frame, text="Confirm Order", font=("Arial", 14), height=2)
         confirm_button.grid(row=7, column=3, columnspan=2, sticky="SE", pady=(0, 10))
 
         back_button = tk.Button(frame, text="←", font="80", width=7, height=3, command=lambda: self.notebook.select(2))
@@ -588,11 +576,28 @@ class OrderingContentFrames:
         banner.lower()
 
         return frame
-
+'''
     def add_info_to_csv(self):
         CsvFileUsage().write_orders_data(self.orders_info)
         CsvFileUsage().write_customer_data(self.customer_info)
+'''
+@dataclass
+class CustomerInfo:
+    name: tk.StringVar = field(default_factory=lambda: tk.StringVar(value=""))
+    address: tk.StringVar = field(default_factory=lambda: tk.StringVar(value=""))
+    phone_number: tk.StringVar = field(default_factory=lambda: tk.StringVar(value=""))
+    email: tk.StringVar = field(default_factory=lambda: tk.StringVar(value=""))
+    notes: tk.StringVar = field(default_factory=lambda: tk.StringVar(value=""))
 
+# Define an OrderInfo data class
+@dataclass
+class OrderInfo:
+    pickup_or_delivery: tk.StringVar = field(default_factory=lambda: tk.StringVar(value=""))
+    bean: tk.StringVar = field(default_factory=lambda: tk.StringVar(value=""))
+    whole_or_ground: tk.StringVar = field(default_factory=lambda: tk.StringVar(value=""))
+    bean_colour: tk.StringVar = field(default_factory=lambda: tk.StringVar(value=""))
+    bean_amount: tk.IntVar = field(default_factory=tk.IntVar)
+    calculated_cost: float = 0.0
 
 
 class CreateNewRoots:
