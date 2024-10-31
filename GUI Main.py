@@ -99,15 +99,16 @@ class CsvFileUsage:
     def write_customer_data(self, customer_info):
         with open(self.customer_data_path, mode="a", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(customer_info)
+            writer.writerow(customer_info.values())
 
     def write_order_data(self, order_info):
         with open(self.orders_path, mode="a", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(order_info)
+            print(order_info.values())
+            writer.writerow(order_info.values())
 
     def get_next_id(self):
-        last_id = 0
+        last_id = 1
         with open(self.customer_data_path, mode='r') as file:
             reader = csv.DictReader(file)
             for _ in reader:
@@ -282,7 +283,7 @@ class OrderingGUI:
         style = ttk.Style()
         style.configure("TNotebook.Tab", padding=[69, 10], font=("Arial", 12))
 
-        content_frames = OrderingContentFrames(self.notebook, parent, self.create_new_roots)
+        content_frames = ContentFrames(self.notebook, parent, self.create_new_roots)
         frame0 = content_frames.main_menu()
         frame1 = content_frames.customer_details_tab()
         frame2 = content_frames.bean_ordering_tab()
@@ -308,7 +309,7 @@ class OrderingGUI:
         main_menu_root.mainloop()
 
 
-class OrderingContentFrames:
+class ContentFrames:
     def __init__(self, notebook, parent, create_new_roots):
         self.notebook = notebook
         self.parent = parent
@@ -395,7 +396,7 @@ class OrderingContentFrames:
         notes_combobox["values"] = ()
         notes_combobox.grid(row=5, column=1, columnspan=2, sticky="SNW", padx=(100, 5), pady=5)
 
-        next_button = tk.Button(frame, text="Next", width=10, font=("Arial, 14"), command=self.customer_create)
+        next_button = tk.Button(frame, text="Next", width=10, font=("Arial, 14"), command=lambda: self.notebook.select(2))
         next_button.grid(row=6, column=0, columnspan=2, sticky="SNW", pady=5)
 
 
@@ -504,7 +505,6 @@ class OrderingContentFrames:
 
         # Get the selected bean type
         selected_bean_type = self.order.bean.get()
-        print(f"Selected bean type: {selected_bean_type}")  # Debugging line
 
         # Retrieve the price based on selected bean type
         self.bean_price = bean_prices.get(selected_bean_type)
@@ -562,7 +562,7 @@ class OrderingContentFrames:
         cancel_button = tk.Button(frame, text="Cancel Order", font=("Arial", 14), height=2)
         cancel_button.grid(row=7, column=0, columnspan=2, sticky="SW", pady=(0, 10))
 
-        confirm_button = tk.Button(frame, text="Confirm Order", font=("Arial", 14), height=2)
+        confirm_button = tk.Button(frame, text="Confirm Order", font=("Arial", 14), height=2, command=self.customer_create)
         confirm_button.grid(row=7, column=3, columnspan=2, sticky="SE", pady=(0, 10))
 
         back_button = tk.Button(frame, text="←", font="80", width=7, height=3, command=lambda: self.notebook.select(2))
